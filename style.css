@@ -63,15 +63,18 @@ body {
 .hero-right img {
   width: 560px;
   border-radius: 14px;
-  transform: perspective(1000px) rotateY(-12deg) rotateX(4deg);
-  box-shadow: 0 30px 80px rgba(56,189,248,0.35);
+  transform: perspective(1200px) rotateY(-18deg) rotateX(6deg);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.6),
+    0 0 60px rgba(56,189,248,0.25);
 }
+
 
 /* CENTER TITLE */
 .center-title {
   text-align: center;
-  margin-top: 40px;
-  margin-bottom: 20px;
+  margin-top: 20px;
+  margin-bottom: 10px;
 }
 
 .center-title h2 {
