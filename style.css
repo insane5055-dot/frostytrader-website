@@ -113,20 +113,22 @@ footer {
   font-size: 13px;
   color: #94a3b8;
 }
-/* PAGE HEADER (for About, Roadmap, etc.) */
+/* PAGE HEADER – CENTERED */
 .page-header {
   padding: 80px 60px 40px;
+  text-align: center;          /* 👈 TEXT CENTER */
+  display: flex;               /* 👇 PERFECT CENTERING */
+  flex-direction: column;
+  align-items: center;
 }
 
 .page-header h1 {
   color: #38bdf8;
   font-size: 36px;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .page-header p {
   color: #cbd5f5;
-  max-width: 700px;
-  line-height: 1.6;
+  font-size: 16px;
 }
-
