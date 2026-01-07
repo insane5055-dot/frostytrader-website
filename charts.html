@@ -1,40 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Live Charts | FrostyTrader</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js"></script>
 </head>
 <body>
 
-<nav>
-  <a href="index.html">Home</a>
-  <a href="charts.html">Charts</a>
-  <a href="about.html">About</a>
-  <a href="roadmap.html">Roadmap</a>
+<!-- NAVBAR (same as Home/About) -->
+<nav class="navbar">
+  <div class="logo">FrostyTrader</div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="charts.html">Charts</a>
+    <a href="about.html">About</a>
+    <a href="roadmap.html">Roadmap</a>
+  </div>
 </nav>
 
-<div class="container">
+<!-- PAGE HEADER -->
+<section class="page-header">
   <h1>Live Market Charts</h1>
   <p>Powered by TradingView</p>
+</section>
 
-  <div style="height:600px;">
-    <div class="tradingview-widget-container" style="height:100%;width:100%">
-      <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+<!-- CHART -->
+<section class="chart-section">
+  <div class="tradingview-widget-container" style="height:600px;">
+    <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
 
-      <script type="text/javascript">
-      {
-        "symbol": "NASDAQ:AAPL",
-        "interval": "5",
-        "theme": "dark",
-        "style": "1",
-        "locale": "en",
-        "autosize": true
-      }
-      </script>
-    </div>
+    <script
+      src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js"
+      async>
+    {
+      "symbol": "NASDAQ:AAPL",
+      "interval": "5",
+      "theme": "dark",
+      "style": "1",
+      "locale": "en",
+      "autosize": true
+    }
+    </script>
   </div>
-</div>
+</section>
 
 <footer>
   © 2025 FrostyTrader · Charts powered by TradingView · Evaluation phase
@@ -42,4 +50,3 @@
 
 </body>
 </html>
-
