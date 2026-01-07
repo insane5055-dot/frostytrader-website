@@ -92,6 +92,20 @@ body {
   padding: 0 20px;
 }
 
+.bottom-chart {
+  margin-top: 30px;
+  padding: 0 40px 60px;
+}
+
+.bottom-chart img {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.7),
+    0 0 40px rgba(56,189,248,0.2);
+}
+
+
 /* FOOTER */
 footer {
   text-align: center;
