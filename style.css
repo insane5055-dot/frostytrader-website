@@ -113,13 +113,12 @@ footer {
   font-size: 13px;
   color: #94a3b8;
 }
-/* PAGE HEADER – CENTERED */
+/* PAGE HEADER – TRUE CENTER */
 .page-header {
-  padding: 80px 60px 40px;
-  text-align: center;          /* 👈 TEXT CENTER */
-  display: flex;               /* 👇 PERFECT CENTERING */
-  flex-direction: column;
-  align-items: center;
+  max-width: 1200px;        /* 👈 width limit */
+  margin: 0 auto;           /* 👈 CENTER the block */
+  padding: 80px 20px 40px;
+  text-align: center;       /* 👈 text center */
 }
 
 .page-header h1 {
@@ -132,3 +131,4 @@ footer {
   color: #cbd5f5;
   font-size: 16px;
 }
+
