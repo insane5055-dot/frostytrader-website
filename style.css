@@ -132,3 +132,17 @@ footer {
   font-size: 16px;
 }
 
+/* Roadmap list alignment fix */
+.roadmap-list {
+  list-style-position: inside;   /* bullets ko content ke paas laata hai */
+  padding-left: 0;
+  margin-left: 0;
+  text-align: center;            /* center layout maintain */
+}
+
+.roadmap-list li {
+  margin: 8px 0;
+  text-indent: -10px;            /* bullet thoda text ke paas */
+}
+
+
