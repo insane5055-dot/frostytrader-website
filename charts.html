@@ -31,23 +31,24 @@
 
 <!-- CHART -->
 <section class="chart-section">
-  <div class="tradingview-widget-container" style="height:600px;">
-    <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-
-    <script
-      src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js"
-      async>
-    {
-      "symbol": "NASDAQ:AAPL",
-      "interval": "5",
-      "theme": "dark",
-      "style": "1",
-      "locale": "en",
-      "autosize": true
-    }
-    </script>
+  <div
+    style="
+      height: 700px;
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0b1220;
+    "
+  >
+    <iframe
+      src="https://chart.frostytrader.in"
+      style="width:100%; height:100%; border:none;"
+      loading="lazy"
+      allowfullscreen
+    ></iframe>
   </div>
 </section>
+
 
 <footer>
   © 2026 FrostyTrader · Charts powered by TradingView · Evaluation phase
