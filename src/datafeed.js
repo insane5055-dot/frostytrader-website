@@ -6,6 +6,7 @@ let lastSearchId = 0;
 const BASE_URL = "https://frosty-backend-4mox.onrender.com";
 
 let socket = null;
+let currentCallback = null;
 
 const Datafeed = {
 
@@ -120,15 +121,19 @@ const Datafeed = {
     }
   },
 
-  // 🔥 REAL-TIME (STABLE VERSION)
+  // 🔥 REAL-TIME (FIXED FOR TIMEFRAME SWITCH)
   subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscriberUID) => {
 
-    // 🔁 already connected ho to dobara mat bana
+    // 👉 Always update callback
+    currentCallback = onRealtimeCallback;
+
+    // 👉 Agar socket already hai to reuse karo
     if (socket) {
-      console.log("♻️ Reusing existing socket");
+      console.log("♻️ Socket reused, callback updated");
       return;
     }
 
+    // 👉 First time connect
     socket = io(BASE_URL, {
       transports: ["websocket"],
       reconnection: true,
@@ -152,20 +157,23 @@ const Datafeed = {
     socket.on("candle", (candle) => {
       console.log("📊 Live Candle:", candle);
 
-      onRealtimeCallback({
-        time: candle.minute * 60 * 1000,
-        open: candle.open,
-        high: candle.high,
-        low: candle.low,
-        close: candle.close,
-        volume: candle.volume
-      });
+      if (currentCallback) {
+        currentCallback({
+          time: candle.minute * 60 * 1000,
+          open: candle.open,
+          high: candle.high,
+          low: candle.low,
+          close: candle.close,
+          volume: candle.volume
+        });
+      }
     });
   },
 
-  // ❌ DISCONNECT MAT KAR (Render issue avoid)
+  // 🔥 FIXED: only clear callback, not socket
   unsubscribeBars: () => {
-    console.log("Unsubscribed (socket kept alive)");
+    currentCallback = null;
+    console.log("Unsubscribed (callback cleared, socket alive)");
   }
 };
 
