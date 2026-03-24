@@ -120,13 +120,33 @@ const Datafeed = {
     }
   },
 
-  // 🔥 REAL-TIME (MAIN MAGIC)
+  // 🔥 REAL-TIME (STABLE VERSION)
   subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscriberUID) => {
 
-    socket = io(BASE_URL);
+    // 🔁 already connected ho to dobara mat bana
+    if (socket) {
+      console.log("♻️ Reusing existing socket");
+      return;
+    }
+
+    socket = io(BASE_URL, {
+      transports: ["websocket"],
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 2000,
+      timeout: 20000
+    });
 
     socket.on("connect", () => {
       console.log("✅ WebSocket Connected");
+    });
+
+    socket.on("disconnect", () => {
+      console.log("❌ WebSocket Disconnected");
+    });
+
+    socket.on("connect_error", (err) => {
+      console.log("⚠️ WS Error:", err.message);
     });
 
     socket.on("candle", (candle) => {
@@ -141,15 +161,11 @@ const Datafeed = {
         volume: candle.volume
       });
     });
-
   },
 
+  // ❌ DISCONNECT MAT KAR (Render issue avoid)
   unsubscribeBars: () => {
-    if (socket) {
-      socket.disconnect();
-      socket = null;
-      console.log("❌ WebSocket Disconnected");
-    }
+    console.log("Unsubscribed (socket kept alive)");
   }
 };
 
