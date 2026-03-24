@@ -2,6 +2,9 @@
 let searchTimeout = null;
 let lastSearchId = 0;
 
+// 👉 🔥 BACKEND URL (CHANGE ONLY HERE FUTURE ME)
+const BASE_URL = "https://frosty-backend-4mox.onrender.com";
+
 const Datafeed = {
 
   onReady: (cb) => {
@@ -21,7 +24,7 @@ const Datafeed = {
 
       try {
         const res = await fetch(
-          `http://127.0.0.1:5000/search?q=${encodeURIComponent(userInput)}`
+          `${BASE_URL}/search?q=${encodeURIComponent(userInput)}`
         );
 
         const data = await res.json();
@@ -32,16 +35,17 @@ const Datafeed = {
         onResultReadyCallback(data);
 
       } catch (err) {
+        console.error("Search error:", err);
         onResultReadyCallback([]);
       }
 
-    }, 300); // 300ms debounce
+    }, 300);
   },
 
   resolveSymbol: async (symbolName, onResolve, onError) => {
     try {
       const res = await fetch(
-        `http://127.0.0.1:5000/resolve?symbol=${encodeURIComponent(symbolName)}`
+        `${BASE_URL}/resolve?symbol=${encodeURIComponent(symbolName)}`
       );
 
       const data = await res.json();
@@ -70,6 +74,7 @@ const Datafeed = {
       });
 
     } catch (err) {
+      console.error("Resolve error:", err);
       onError("Resolve error");
     }
   },
@@ -79,7 +84,7 @@ const Datafeed = {
       const { from, to } = periodParams;
 
       const url =
-        `http://127.0.0.1:5000/history` +
+        `${BASE_URL}/history` +
         `?security_id=${symbolInfo.security_id}` +
         `&exchange=${symbolInfo.exchange_segment}` +
         `&instrument=${symbolInfo.instrument}` +
@@ -107,6 +112,7 @@ const Datafeed = {
       onHistory(bars, { noData: false });
 
     } catch (err) {
+      console.error("History error:", err);
       onError("History error");
     }
   },
