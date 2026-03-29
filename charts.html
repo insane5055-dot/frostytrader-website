@@ -1,68 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>FrostyTrader Charts</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <title>TradingView – Final Working Setup</title>
 
-  <!-- TradingView Library -->
-  <script src="./charting_library/charting_library.js"></script>
+    <!-- TradingView Library -->
+    <script src="charting_library/charting_library.js"></script>
 
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #0b1220;
-      font-family: Arial, sans-serif;
-    }
-    #tv_chart_container {
-      width: 100%;
-      height: 100vh;
-    }
-    footer {
-      text-align: center;
-      color: #9ca3af;
-      padding: 8px;
-      font-size: 12px;
-      background: #020617;
-    }
-  </style>
+    <!-- 🔥 ADD THIS (Socket.IO) -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <style>
+        html, body, #tv {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
 
 <body>
+<div id="tv"></div>
 
-  <div id="tv_chart_container"></div>
+<script type="module">
+    import Datafeed from "./src/datafeed.js";
 
-  <footer>
-    © 2026 FrostyTrader · Charts powered by TradingView · Evaluation phase
-  </footer>
+    const widget = new TradingView.widget({
+        container: "tv",
+        library_path: "charting_library/",
+        datafeed: Datafeed,
 
-  <script>
-    window.addEventListener("DOMContentLoaded", function () {
-      new TradingView.widget({
-        container_id: "tv_chart_container",
+        symbol: "NSE:Nifty 50",
+        interval: "1",
 
-        symbol: "BTCUSDT",
-        interval: "5",
         timezone: "Asia/Kolkata",
-
-        theme: "dark",
-        style: "1",
+        autosize: true,
         locale: "en",
 
-        enable_publishing: false,
-        hide_side_toolbar: false,
-        allow_symbol_change: true,
-
-        fullscreen: false,
-        autosize: true,
-
-        datafeed: "https://demo_feed.tradingview.com",
-        library_path: "./charting_library/"
-      });
+        // 🔥 IMPORTANT
+        disabled_features: ["use_localstorage_for_settings"],
+        enabled_features: ["study_templates"]
     });
-  </script>
 
+    widget.onChartReady(() => {
+        const chart = widget.chart();
+
+        // 🔥 Smooth TF switching fix
+        chart.onIntervalChanged().subscribe(null, () => {
+            setTimeout(() => {
+                chart.executeActionById("chartAutoScale");
+                chart.executeActionById("chartReset");
+            }, 50);
+        });
+    });
+</script>
 </body>
 </html>
