@@ -1,59 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8" />
-    <title>TradingView – Final Working Setup</title>
-
-    <!-- TradingView Library -->
-    <script src="charting_library/charting_library.js"></script>
-
-    <!-- 🔥 ADD THIS (Socket.IO) -->
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-
+    <title>FrostyTrader</title>
     <style>
-        html, body, #tv {
+        body {
             margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        a {
+            color: white;
+            margin: 10px;
+            text-decoration: none;
+        }
+
+        .hero {
+            padding: 60px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #2563eb;
+            border: none;
+            color: white;
+            cursor: pointer;
         }
     </style>
 </head>
 
 <body>
-<div id="tv"></div>
 
-<script type="module">
-    import Datafeed from "./src/datafeed.js";
+<div class="nav">
+    <h2>FrostyTrader ❄️</h2>
 
-    const widget = new TradingView.widget({
-        container: "tv",
-        library_path: "charting_library/",
-        datafeed: Datafeed,
+    <div>
+        <a href="index.html">Home</a>
+        <a href="charts.html">Charts</a>
+        <a href="#">About</a>
+    </div>
+</div>
 
-        symbol: "NSE:Nifty 50",
-        interval: "1",
+<div class="hero">
+    <h1>FrostyTrader</h1>
+    <p>Web-based Market Analytics & Charting Platform</p>
 
-        timezone: "Asia/Kolkata",
-        autosize: true,
-        locale: "en",
+    <a href="charts.html">
+        <button>View Live Charts</button>
+    </a>
+</div>
 
-        // 🔥 IMPORTANT
-        disabled_features: ["use_localstorage_for_settings"],
-        enabled_features: ["study_templates"]
-    });
-
-    widget.onChartReady(() => {
-        const chart = widget.chart();
-
-        // 🔥 Smooth TF switching fix
-        chart.onIntervalChanged().subscribe(null, () => {
-            setTimeout(() => {
-                chart.executeActionById("chartAutoScale");
-                chart.executeActionById("chartReset");
-            }, 50);
-        });
-    });
-</script>
 </body>
 </html>
