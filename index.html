@@ -60,40 +60,29 @@
 
 <!-- ================= LIVE NIFTY CHART ================= -->
 <div class="bottom-chart">
-    <div id="nifty_chart" style="height:500px;"></div>
+
+    <div class="tradingview-widget-container">
+        <div id="tradingview_chart"></div>
+
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        {
+            "width": "100%",
+            "height": 500,
+            "symbol": "NSE:NIFTY",
+            "interval": "5",
+            "timezone": "Asia/Kolkata",
+            "theme": "dark",
+            "style": "1",
+            "locale": "en",
+            "allow_symbol_change": true,
+            "support_host": "https://www.tradingview.com"
+        }
+        </script>
+    </div>
+
 </div>
 
 <!-- ================= FOOTER ================= -->
 <footer>
     © 2026 FrostyTrader · Charts powered by TradingView
 </footer>
-
-<!-- ================= TRADINGVIEW SCRIPT ================= -->
-<script src="https://s3.tradingview.com/tv.js"></script>
-
-<script>
-window.addEventListener("DOMContentLoaded", function () {
-
-    new TradingView.widget({
-        container_id: "nifty_chart",
-
-        symbol: "NSE:NIFTY",
-        interval: "5",
-        timezone: "Asia/Kolkata",
-
-        theme: "dark",
-        style: "1",
-        locale: "en",
-
-        toolbar_bg: "#020617",
-        enable_publishing: false,
-        allow_symbol_change: true,
-
-        autosize: true
-    });
-
-});
-</script>
-
-</body>
-</html>
