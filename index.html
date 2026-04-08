@@ -5,18 +5,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FrostyTrader</title>
 
-    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            margin: 0;
+            background: radial-gradient(circle at top, #0a1a2f, #020617);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 10%;
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(10px);
+            background: rgba(2, 6, 23, 0.6);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        .nav-links a {
+            margin-left: 20px;
+            color: #cbd5f5;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #38bdf8;
+        }
+
+        /* HERO */
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 80px 10%;
+        }
+
+        .hero-left h1 {
+            font-size: 52px;
+            background: linear-gradient(90deg, #38bdf8, #22c55e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-left p {
+            color: #94a3b8;
+            margin-top: 15px;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 14px 28px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #0ea5e9, #22c55e);
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .cta-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+        }
+
+        .hero-right img {
+            width: 500px;
+            border-radius: 16px;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
+            transform: rotate(-2deg);
+        }
+
+        /* CENTER TITLE */
+        .center-title {
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .center-title h2 {
+            font-size: 34px;
+            color: #38bdf8;
+        }
+
+        .center-title p {
+            color: #64748b;
+        }
+
+        /* CHART */
+        .bottom-chart {
+            padding: 0 5%;
+        }
+
+        iframe {
+            width: 100%;
+            height: 520px;
+            border: none;
+            border-radius: 14px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 40px;
+            color: #64748b;
+        }
+
+        /* BACKGROUND GLOW */
+        body::before {
+            content: "";
+            position: fixed;
+            top: -200px;
+            left: -200px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #0ea5e9, transparent);
+            filter: blur(120px);
+            opacity: 0.3;
+            z-index: -1;
+        }
+    </style>
+
 </head>
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
+<!-- NAVBAR -->
 <div class="navbar">
-
-    <div class="logo">
-        FrostyTrader ❄️
-    </div>
+    <div class="logo">FrostyTrader ❄️</div>
 
     <div class="nav-links">
         <a href="index.html">Home</a>
@@ -24,13 +155,11 @@
         <a href="about.html">About</a>
         <a href="roadmap.html">Roadmap</a>
     </div>
-
 </div>
 
-<!-- ================= HERO ================= -->
+<!-- HERO -->
 <div class="hero">
 
-    <!-- LEFT -->
     <div class="hero-left">
         <h1>FrostyTrader</h1>
 
@@ -41,40 +170,31 @@
         </p>
 
         <a href="charts.html" class="cta-btn">
-            View Live Charts
+            🚀 View Live Charts
         </a>
     </div>
 
-    <!-- RIGHT -->
     <div class="hero-right">
-        <img src="assets/chart-preview.png" alt="Chart">
+        <img src="assets/chart-preview.png" alt="Chart Preview">
     </div>
 
 </div>
 
-<!-- ================= CENTER TITLE ================= -->
+<!-- TITLE -->
 <div class="center-title">
     <h2>Live Market Charts</h2>
     <p>Powered by TradingView</p>
 </div>
 
-<!-- ================= LIVE NIFTY CHART ================= -->
+<!-- CHART -->
 <div class="bottom-chart">
-
-    <iframe 
-        src="charts.html"
-        style="
-            width:100%;
-            height:520px;
-            border:none;
-            border-radius:12px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-        ">
-    </iframe>
-
+    <iframe src="charts.html"></iframe>
 </div>
 
-<!-- ================= FOOTER ================= -->
+<!-- FOOTER -->
 <footer>
-    © 2026 FrostyTrader · Charts powered by TradingView
+    © 2026 FrostyTrader · Built for Traders ⚡
 </footer>
+
+</body>
+</html>
