@@ -160,30 +160,33 @@ body::before {
   justify-content: center;
 }
 
-/* 🔥 NEON WRAPPER (MAIN FIX) */
+/* 🔥 FIXED NEON WRAPPER */
 .chart-wrapper {
   width: 100%;
   border-radius: 18px;
   padding: 2px;
 
-  /* gradient border */
-  background: linear-gradient(90deg, #0ea5e9, #22c55e);
+  /* ❌ background hata diya */
+  background: transparent;
 
-  /* neon glow */
+  /* border */
+  border: 2px solid rgba(56,189,248,0.4);
+
+  /* glow */
   box-shadow:
-    0 0 10px rgba(56,189,248,0.5),
-    0 0 30px rgba(56,189,248,0.4),
-    0 0 60px rgba(56,189,248,0.3);
+    0 0 10px rgba(56,189,248,0.6),
+    0 0 25px rgba(56,189,248,0.4),
+    0 0 50px rgba(56,189,248,0.3);
 
   transition: 0.3s;
 }
 
-/* hover glow boost */
+/* hover glow */
 .chart-wrapper:hover {
   box-shadow:
-    0 0 20px rgba(56,189,248,0.8),
-    0 0 50px rgba(56,189,248,0.6),
-    0 0 100px rgba(56,189,248,0.4);
+    0 0 20px rgba(56,189,248,0.9),
+    0 0 40px rgba(56,189,248,0.7),
+    0 0 80px rgba(56,189,248,0.5);
 }
 
 /* iframe */
@@ -193,6 +196,7 @@ body::before {
   border-radius: 16px;
   border: none;
   display: block;
+  background: #000; /* fallback */
 }
 
 /* ================= FOOTER ================= */
