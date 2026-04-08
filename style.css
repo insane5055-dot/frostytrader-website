@@ -5,7 +5,6 @@ body {
   color: #e5e7eb;
   overflow-x: hidden;
 
-  /* fallback gradient (video ke niche) */
   background: radial-gradient(circle at top, #0f172a, #020617);
 }
 
@@ -30,7 +29,7 @@ body::after {
   z-index: -1;
 }
 
-/* NEON GLOW EFFECT */
+/* NEON GLOW BACKGROUND */
 body::before {
   content: "";
   position: fixed;
@@ -89,8 +88,6 @@ body::before {
 
 .hero-left h1 {
   font-size: 42px;
-
-  /* neon gradient text */
   background: linear-gradient(90deg, #38bdf8, #22c55e);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -121,7 +118,7 @@ body::before {
   box-shadow: 0 0 20px rgba(34,197,94,0.6);
 }
 
-/* ================= RIGHT IMAGE (UNCHANGED STYLE + ENHANCED GLOW) ================= */
+/* ================= RIGHT IMAGE ================= */
 .hero-right img {
   width: 560px;
   border-radius: 14px;
@@ -157,20 +154,40 @@ body::before {
 }
 
 .bottom-chart {
-  margin-top: 30px;
+  margin-top: 40px;
   padding: 0 40px 60px;
+  display: flex;
+  justify-content: center;
 }
 
-/* iframe styling */
+/* 🔥 NEON FRAME (MAIN UPGRADE) */
 .bottom-chart iframe {
   width: 100%;
   height: 520px;
-  border: none;
-  border-radius: 12px;
+  border-radius: 16px;
+  border: 2px solid rgba(56,189,248,0.4);
 
+  /* base shadow */
   box-shadow:
     0 20px 60px rgba(0,0,0,0.7),
-    0 0 40px rgba(56,189,248,0.2);
+
+    /* neon glow */
+    0 0 10px rgba(56,189,248,0.5),
+    0 0 20px rgba(56,189,248,0.4),
+    0 0 40px rgba(56,189,248,0.3),
+    0 0 80px rgba(56,189,248,0.2);
+
+  transition: 0.3s ease;
+}
+
+/* 🔥 HOVER GLOW BOOST */
+.bottom-chart iframe:hover {
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.7),
+    0 0 20px rgba(56,189,248,0.8),
+    0 0 40px rgba(56,189,248,0.6),
+    0 0 80px rgba(56,189,248,0.4),
+    0 0 120px rgba(56,189,248,0.3);
 }
 
 /* ================= FOOTER ================= */
