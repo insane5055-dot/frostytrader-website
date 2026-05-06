@@ -49,18 +49,22 @@ const widget = new TradingView.widget({
 
     locale: "en",
 
+    // =====================================================
+    // FEATURES
+    // =====================================================
     disabled_features: [
         "use_localstorage_for_settings"
     ],
 
     enabled_features: [
-        "study_templates"
+        "study_templates",
+        "custom_indicators"
     ],
 
     // =====================================================
-    // 🔥 CUSTOM INDICATOR
+    // 🔥 CUSTOM INDICATORS
     // =====================================================
-    custom_indicators_getter: function (PineJS) {
+    custom_indicators_getter: function(PineJS) {
 
         return Promise.resolve([
 
@@ -73,13 +77,15 @@ const widget = new TradingView.widget({
 
                     id: "AverageHighLowMA@custom",
 
-                    description: "Average High Low Moving Average",
+                    name: "Average High Low MA",
+
+                    description: "Average High Low MA",
 
                     shortDescription: "AHLMA",
 
-                    is_price_study: true,
-
                     isCustomIndicator: true,
+
+                    is_price_study: true,
 
                     format: {
                         type: "price",
@@ -139,7 +145,9 @@ const widget = new TradingView.widget({
                         },
 
                         inputs: {
+
                             length: 20
+
                         }
                     },
 
@@ -157,15 +165,16 @@ const widget = new TradingView.widget({
                     ]
                 },
 
-                constructor: function () {
+                constructor: function() {
 
-                    this.init = function (context, inputCallback) {
+                    this.init = function(context, inputCallback) {
 
                         this._context = context;
                         this._input = inputCallback;
+
                     };
 
-                    this.main = function (context, inputCallback) {
+                    this.main = function(context, inputCallback) {
 
                         this._context = context;
                         this._input = inputCallback;
@@ -203,11 +212,18 @@ const widget = new TradingView.widget({
 // =====================================================
 widget.onChartReady(() => {
 
-    const chart = widget.chart();
-
     console.log("✅ Chart Ready");
 
-    // Smooth timeframe switching
+    const chart = widget.chart();
+
+    // =====================================================
+    // 🔥 DEBUG
+    // =====================================================
+    console.log("🔥 Custom Indicator Loaded");
+
+    // =====================================================
+    // 🔥 Smooth TF Switching Fix
+    // =====================================================
     chart.onIntervalChanged().subscribe(null, () => {
 
         setTimeout(() => {
