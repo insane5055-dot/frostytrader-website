@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8" />
     <title>TradingView – Final Working Setup</title>
@@ -7,11 +8,13 @@
     <!-- TradingView Library -->
     <script src="charting_library/charting_library.js"></script>
 
-    <!-- 🔥 ADD THIS (Socket.IO) -->
+    <!-- Socket.IO -->
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 
     <style>
-        html, body, #tv {
+        html,
+        body,
+        #tv {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -21,39 +24,205 @@
 </head>
 
 <body>
+
 <div id="tv"></div>
 
 <script type="module">
-    import Datafeed from "./src/datafeed.js";
 
-    const widget = new TradingView.widget({
-        container: "tv",
-        library_path: "charting_library/",
-        datafeed: Datafeed,
+import Datafeed from "./src/datafeed.js";
 
-        symbol: "NSE:Nifty 50",
-        interval: "1",
+const widget = new TradingView.widget({
 
-        timezone: "Asia/Kolkata",
-        autosize: true,
-        locale: "en",
+    container: "tv",
 
-        // 🔥 IMPORTANT
-        disabled_features: ["use_localstorage_for_settings"],
-        enabled_features: ["study_templates"]
+    library_path: "charting_library/",
+
+    datafeed: Datafeed,
+
+    symbol: "NSE:Nifty 50",
+
+    interval: "1",
+
+    timezone: "Asia/Kolkata",
+
+    autosize: true,
+
+    locale: "en",
+
+    disabled_features: [
+        "use_localstorage_for_settings"
+    ],
+
+    enabled_features: [
+        "study_templates"
+    ],
+
+    // =====================================================
+    // 🔥 CUSTOM INDICATOR
+    // =====================================================
+    custom_indicators_getter: function (PineJS) {
+
+        return Promise.resolve([
+
+            {
+                name: "Average High Low MA",
+
+                metainfo: {
+
+                    _metainfoVersion: 51,
+
+                    id: "AverageHighLowMA@custom",
+
+                    description: "Average High Low Moving Average",
+
+                    shortDescription: "AHLMA",
+
+                    is_price_study: true,
+
+                    isCustomIndicator: true,
+
+                    format: {
+                        type: "price",
+                        precision: 2
+                    },
+
+                    plots: [
+
+                        {
+                            id: "high_ma",
+                            type: "line"
+                        },
+
+                        {
+                            id: "low_ma",
+                            type: "line"
+                        }
+
+                    ],
+
+                    styles: {
+
+                        high_ma: {
+                            title: "High MA"
+                        },
+
+                        low_ma: {
+                            title: "Low MA"
+                        }
+
+                    },
+
+                    defaults: {
+
+                        styles: {
+
+                            high_ma: {
+                                linestyle: 0,
+                                linewidth: 2,
+                                plottype: 0,
+                                trackPrice: false,
+                                transparency: 0,
+                                visible: true,
+                                color: "#ff0000"
+                            },
+
+                            low_ma: {
+                                linestyle: 0,
+                                linewidth: 2,
+                                plottype: 0,
+                                trackPrice: false,
+                                transparency: 0,
+                                visible: true,
+                                color: "#00ff00"
+                            }
+
+                        },
+
+                        inputs: {
+                            length: 20
+                        }
+                    },
+
+                    inputs: [
+
+                        {
+                            id: "length",
+                            name: "Length",
+                            type: "integer",
+                            defval: 20,
+                            min: 1,
+                            max: 500
+                        }
+
+                    ]
+                },
+
+                constructor: function () {
+
+                    this.init = function (context, inputCallback) {
+
+                        this._context = context;
+                        this._input = inputCallback;
+                    };
+
+                    this.main = function (context, inputCallback) {
+
+                        this._context = context;
+                        this._input = inputCallback;
+
+                        const length = this._input(0);
+
+                        // 🔥 USE YOUR CUSTOM OHLC DATA
+                        const high_ma = PineJS.Std.sma(
+                            PineJS.Std.high(this._context),
+                            length,
+                            this._context
+                        );
+
+                        const low_ma = PineJS.Std.sma(
+                            PineJS.Std.low(this._context),
+                            length,
+                            this._context
+                        );
+
+                        return [
+                            high_ma,
+                            low_ma
+                        ];
+                    };
+                }
+            }
+
+        ]);
+    }
+
+});
+
+// =====================================================
+// 🔥 CHART READY
+// =====================================================
+widget.onChartReady(() => {
+
+    const chart = widget.chart();
+
+    console.log("✅ Chart Ready");
+
+    // Smooth timeframe switching
+    chart.onIntervalChanged().subscribe(null, () => {
+
+        setTimeout(() => {
+
+            chart.executeActionById("chartAutoScale");
+
+            chart.executeActionById("chartReset");
+
+        }, 50);
+
     });
 
-    widget.onChartReady(() => {
-        const chart = widget.chart();
+});
 
-        // 🔥 Smooth TF switching fix
-        chart.onIntervalChanged().subscribe(null, () => {
-            setTimeout(() => {
-                chart.executeActionById("chartAutoScale");
-                chart.executeActionById("chartReset");
-            }, 50);
-        });
-    });
 </script>
+
 </body>
 </html>
