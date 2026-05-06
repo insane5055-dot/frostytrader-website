@@ -65,148 +65,147 @@ const widget = new TradingView.widget({
     // 🔥 CUSTOM INDICATORS
     // =====================================================
     custom_indicators_getter: function(PineJS) {
-console.log("CUSTOM INDICATOR FUNCTION RUNNING");
-        
-        return Promise.resolve([
 
-            {
-                name: "Average High Low MA",
+    console.log("CUSTOM INDICATOR FUNCTION RUNNING");
 
-                metainfo: {
+    return Promise.resolve([
 
-                    _metainfoVersion: 51,
+        {
 
-                    id: "AverageHighLowMA@custom",
+            name: "AHLMA",
 
-                    name: "Average High Low MA",
+            metainfo: {
 
-                    description: "Average High Low MA",
+                _metainfoVersion: 53,
 
-                    shortDescription: "AHLMA",
+                id: "AHLMA@tv-basicstudies-1",
 
-                    isCustomIndicator: true,
+                description: "Average High Low MA",
 
-                    is_price_study: true,
+                shortDescription: "AHLMA",
 
-                    format: {
-                        type: "price",
-                        precision: 2
+                isCustomIndicator: true,
+
+                is_price_study: true,
+
+                linkedToSeries: true,
+
+                format: {
+                    type: "price",
+                    precision: 2
+                },
+
+                plots: [
+
+                    {
+                        id: "plot_0",
+                        type: "line"
                     },
 
-                    plots: [
+                    {
+                        id: "plot_1",
+                        type: "line"
+                    }
 
-                        {
-                            id: "high_ma",
-                            type: "line"
-                        },
+                ],
 
-                        {
-                            id: "low_ma",
-                            type: "line"
-                        }
-
-                    ],
+                defaults: {
 
                     styles: {
 
-                        high_ma: {
-                            title: "High MA"
+                        plot_0: {
+                            linestyle: 0,
+                            linewidth: 2,
+                            plottype: 0,
+                            trackPrice: false,
+                            transparency: 0,
+                            visible: true,
+                            color: "#ff0000"
                         },
 
-                        low_ma: {
-                            title: "Low MA"
+                        plot_1: {
+                            linestyle: 0,
+                            linewidth: 2,
+                            plottype: 0,
+                            trackPrice: false,
+                            transparency: 0,
+                            visible: true,
+                            color: "#00ff00"
                         }
 
                     },
 
-                    defaults: {
-
-                        styles: {
-
-                            high_ma: {
-                                linestyle: 0,
-                                linewidth: 2,
-                                plottype: 0,
-                                trackPrice: false,
-                                transparency: 0,
-                                visible: true,
-                                color: "#ff0000"
-                            },
-
-                            low_ma: {
-                                linestyle: 0,
-                                linewidth: 2,
-                                plottype: 0,
-                                trackPrice: false,
-                                transparency: 0,
-                                visible: true,
-                                color: "#00ff00"
-                            }
-
-                        },
-
-                        inputs: {
-
-                            length: 20
-
-                        }
-                    },
-
-                    inputs: [
-
-                        {
-                            id: "length",
-                            name: "Length",
-                            type: "integer",
-                            defval: 20,
-                            min: 1,
-                            max: 500
-                        }
-
-                    ]
+                    inputs: {
+                        length: 20
+                    }
                 },
 
-                constructor: function() {
+                styles: {
 
-                    this.init = function(context, inputCallback) {
+                    plot_0: {
+                        title: "High MA"
+                    },
 
-                        this._context = context;
-                        this._input = inputCallback;
+                    plot_1: {
+                        title: "Low MA"
+                    }
 
-                    };
+                },
 
-                    this.main = function(context, inputCallback) {
+                inputs: [
 
-                        this._context = context;
-                        this._input = inputCallback;
+                    {
+                        id: "length",
+                        name: "Length",
+                        defval: 20,
+                        type: "integer",
+                        min: 1,
+                        max: 500
+                    }
 
-                        const length = this._input(0);
+                ]
+            },
 
-                        // 🔥 USE YOUR CUSTOM OHLC DATA
-                        const high_ma = PineJS.Std.sma(
-                            PineJS.Std.high(this._context),
-                            length,
-                            this._context
-                        );
+            constructor: function() {
 
-                        const low_ma = PineJS.Std.sma(
-                            PineJS.Std.low(this._context),
-                            length,
-                            this._context
-                        );
+                this.init = function(context, inputCallback) {
 
-                        return [
-                            high_ma,
-                            low_ma
-                        ];
-                    };
-                }
+                    this._context = context;
+                    this._input = inputCallback;
+
+                };
+
+                this.main = function(context, inputCallback) {
+
+                    this._context = context;
+                    this._input = inputCallback;
+
+                    const length = this._input(0);
+
+                    const high_sma = PineJS.Std.sma(
+                        PineJS.Std.high(this._context),
+                        length,
+                        this._context
+                    );
+
+                    const low_sma = PineJS.Std.sma(
+                        PineJS.Std.low(this._context),
+                        length,
+                        this._context
+                    );
+
+                    return [
+
+                        high_sma,
+                        low_sma
+
+                    ];
+                };
             }
+        }
 
-        ]);
-    }
-
-});
+    ]);
+},
 
 // =====================================================
 // 🔥 CHART READY
