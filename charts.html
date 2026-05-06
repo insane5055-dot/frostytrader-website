@@ -19,6 +19,7 @@
             padding: 0;
             width: 100%;
             height: 100%;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -32,7 +33,7 @@
 import Datafeed from "./src/datafeed.js";
 
 // =====================================================
-// 🔥 TRADINGVIEW WIDGET
+// 🔥 CREATE WIDGET
 // =====================================================
 const widget = new TradingView.widget({
 
@@ -69,7 +70,7 @@ const widget = new TradingView.widget({
     // =====================================================
     custom_indicators_getter: function(PineJS) {
 
-        console.log("CUSTOM INDICATOR FUNCTION RUNNING");
+        console.log("🔥 CUSTOM INDICATOR FUNCTION RUNNING");
 
         return Promise.resolve([
 
@@ -83,7 +84,7 @@ const widget = new TradingView.widget({
 
                     id: "AHLMA@tv-basicstudies-1",
 
-                    description: "Average High Low MA",
+                    description: "Average High Low Moving Average",
 
                     shortDescription: "AHLMA",
 
@@ -111,6 +112,18 @@ const widget = new TradingView.widget({
                         }
 
                     ],
+
+                    styles: {
+
+                        plot_0: {
+                            title: "High MA"
+                        },
+
+                        plot_1: {
+                            title: "Low MA"
+                        }
+
+                    },
 
                     defaults: {
 
@@ -145,18 +158,6 @@ const widget = new TradingView.widget({
                         }
                     },
 
-                    styles: {
-
-                        plot_0: {
-                            title: "High MA"
-                        },
-
-                        plot_1: {
-                            title: "Low MA"
-                        }
-
-                    },
-
                     inputs: [
 
                         {
@@ -178,6 +179,9 @@ const widget = new TradingView.widget({
                         this._context = context;
                         this._input = inputCallback;
 
+                        this.highs = [];
+                        this.lows = [];
+
                     };
 
                     this.main = function(context, inputCallback) {
@@ -187,23 +191,61 @@ const widget = new TradingView.widget({
 
                         const length = this._input(0);
 
-                        // 🔥 USE YOUR CUSTOM OHLC DATA
-                        const high_sma = PineJS.Std.sma(
-                            PineJS.Std.high(this._context),
-                            length,
-                            this._context
-                        );
+                        // =====================================================
+                        // 🔥 GET CURRENT BAR DATA
+                        // =====================================================
+                        const high = PineJS.Std.high(this._context);
 
-                        const low_sma = PineJS.Std.sma(
-                            PineJS.Std.low(this._context),
-                            length,
-                            this._context
-                        );
+                        const low = PineJS.Std.low(this._context);
 
+                        // =====================================================
+                        // 🔥 STORE VALUES
+                        // =====================================================
+                        this.highs.push(high);
+
+                        this.lows.push(low);
+
+                        // =====================================================
+                        // 🔥 LIMIT ARRAY SIZE
+                        // =====================================================
+                        if (this.highs.length > length) {
+                            this.highs.shift();
+                        }
+
+                        if (this.lows.length > length) {
+                            this.lows.shift();
+                        }
+
+                        // =====================================================
+                        // 🔥 CALCULATE SMA
+                        // =====================================================
+                        let high_sum = 0;
+
+                        let low_sum = 0;
+
+                        for (let i = 0; i < this.highs.length; i++) {
+
+                            high_sum += this.highs[i];
+
+                        }
+
+                        for (let i = 0; i < this.lows.length; i++) {
+
+                            low_sum += this.lows[i];
+
+                        }
+
+                        const high_ma = high_sum / this.highs.length;
+
+                        const low_ma = low_sum / this.lows.length;
+
+                        // =====================================================
+                        // 🔥 RETURN VALUES
+                        // =====================================================
                         return [
 
-                            high_sma,
-                            low_sma
+                            high_ma,
+                            low_ma
 
                         ];
                     };
@@ -227,7 +269,7 @@ widget.onChartReady(() => {
     console.log("🔥 Custom Indicator Loaded");
 
     // =====================================================
-    // 🔥 Smooth TF Switching Fix
+    // 🔥 TF SWITCH FIX
     // =====================================================
     chart.onIntervalChanged().subscribe(null, () => {
 
