@@ -133,7 +133,7 @@ const widget = new TradingView.widget({
                                 linestyle: 0,
                                 linewidth: 2,
                                 plottype: 0,
-                                trackPrice: false,
+                               trackPrice: false,
                                 transparency: 0,
                                 visible: true,
                                 color: "#ff0000"
@@ -179,11 +179,11 @@ const widget = new TradingView.widget({
                         this._context = context;
                         this._input = inputCallback;
 
-                        this.highs = [];
-                        this.lows = [];
-
                     };
 
+                    // =====================================================
+                    // 🔥 TRUE SMA LOGIC
+                    // =====================================================
                     this.main = function(context, inputCallback) {
 
                         this._context = context;
@@ -191,53 +191,23 @@ const widget = new TradingView.widget({
 
                         const length = this._input(0);
 
-                        // =====================================================
-                        // 🔥 GET CURRENT BAR DATA
-                        // =====================================================
-                        const high = PineJS.Std.high(this._context);
-
-                        const low = PineJS.Std.low(this._context);
-
-                        // =====================================================
-                        // 🔥 STORE VALUES
-                        // =====================================================
-                        this.highs.push(high);
-
-                        this.lows.push(low);
-
-                        // =====================================================
-                        // 🔥 LIMIT ARRAY SIZE
-                        // =====================================================
-                        if (this.highs.length > length) {
-                            this.highs.shift();
-                        }
-
-                        if (this.lows.length > length) {
-                            this.lows.shift();
-                        }
-
-                        // =====================================================
-                        // 🔥 CALCULATE SMA
-                        // =====================================================
                         let high_sum = 0;
-
                         let low_sum = 0;
 
-                        for (let i = 0; i < this.highs.length; i++) {
+                        // =====================================================
+                        // 🔥 USE HISTORICAL OHLC DATA
+                        // =====================================================
+                        for (let i = 0; i < length; i++) {
 
-                            high_sum += this.highs[i];
+                            high_sum += PineJS.Std.high(this._context, i);
+
+                            low_sum += PineJS.Std.low(this._context, i);
 
                         }
 
-                        for (let i = 0; i < this.lows.length; i++) {
+                        const high_ma = high_sum / length;
 
-                            low_sum += this.lows[i];
-
-                        }
-
-                        const high_ma = high_sum / this.highs.length;
-
-                        const low_ma = low_sum / this.lows.length;
+                        const low_ma = low_sum / length;
 
                         // =====================================================
                         // 🔥 RETURN VALUES
