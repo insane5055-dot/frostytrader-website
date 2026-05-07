@@ -133,7 +133,7 @@ const widget = new TradingView.widget({
                                 linestyle: 0,
                                 linewidth: 2,
                                 plottype: 0,
-                               trackPrice: false,
+                                trackPrice: false,
                                 transparency: 0,
                                 visible: true,
                                 color: "#ff0000"
@@ -179,10 +179,16 @@ const widget = new TradingView.widget({
                         this._context = context;
                         this._input = inputCallback;
 
+                        // 🔥 HISTORY STORAGE
+                        this.high_history = [];
+                        this.low_history = [];
+
+                        this.lastIndex = -1;
+
                     };
 
                     // =====================================================
-                    // 🔥 TRUE SMA LOGIC
+                    // 🔥 MAIN INDICATOR LOGIC
                     // =====================================================
                     this.main = function(context, inputCallback) {
 
@@ -191,26 +197,69 @@ const widget = new TradingView.widget({
 
                         const length = this._input(0);
 
-                        let high_sum = 0;
-                        let low_sum = 0;
+                        // =====================================================
+                        // 🔥 CURRENT BAR VALUES
+                        // =====================================================
+                        const high = PineJS.Std.high(this._context);
+
+                        const low = PineJS.Std.low(this._context);
 
                         // =====================================================
-                        // 🔥 USE HISTORICAL OHLC DATA
+                        // 🔥 BAR INDEX
                         // =====================================================
-                        for (let i = 0; i < length; i++) {
+                        const currentIndex = this._context.symbol.index;
 
-                            high_sum += PineJS.Std.high(this._context, i);
+                        // =====================================================
+                        // 🔥 PREVENT DUPLICATE CANDLES
+                        // =====================================================
+                        if (this.lastIndex !== currentIndex) {
 
-                            low_sum += PineJS.Std.low(this._context, i);
+                            this.high_history.push(high);
+
+                            this.low_history.push(low);
+
+                            this.lastIndex = currentIndex;
+
+                            // =====================================================
+                            // 🔥 LIMIT HISTORY SIZE
+                            // =====================================================
+                            if (this.high_history.length > length) {
+                                this.high_history.shift();
+                            }
+
+                            if (this.low_history.length > length) {
+                                this.low_history.shift();
+                            }
 
                         }
 
-                        const high_ma = high_sum / length;
+                        // =====================================================
+                        // 🔥 SMA CALCULATION
+                        // =====================================================
+                        let high_sum = 0;
 
-                        const low_ma = low_sum / length;
+                        let low_sum = 0;
+
+                        for (let i = 0; i < this.high_history.length; i++) {
+
+                            high_sum += this.high_history[i];
+
+                        }
+
+                        for (let i = 0; i < this.low_history.length; i++) {
+
+                            low_sum += this.low_history[i];
+
+                        }
+
+                        const high_ma =
+                            high_sum / this.high_history.length;
+
+                        const low_ma =
+                            low_sum / this.low_history.length;
 
                         // =====================================================
-                        // 🔥 RETURN VALUES
+                        // 🔥 RETURN PLOTS
                         // =====================================================
                         return [
 
