@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
-    <title>TradingView – Final Working Setup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>TradingView - Final Working Setup</title>
 
     <!-- TradingView Library -->
     <script src="charting_library/charting_library.js"></script>
@@ -21,271 +23,76 @@
             height: 100%;
             overflow: hidden;
         }
+
+        body {
+            background: #131722;
+        }
     </style>
 </head>
 
 <body>
 
-<div id="tv"></div>
+    <div id="tv"></div>
 
-<script type="module">
+    <script type="module">
 
-import Datafeed from "./src/datafeed.js";
+        import Datafeed from "./src/datafeed.js";
 
-// =====================================================
-// 🔥 CREATE WIDGET
-// =====================================================
-const widget = new TradingView.widget({
+        const widget = new TradingView.widget({
+            container: "tv",
 
-    container: "tv",
+            library_path: "./charting_library/",
 
-    library_path: "charting_library/",
+            datafeed: Datafeed,
 
-    datafeed: Datafeed,
+            symbol: "NSE:NIFTY50",
 
-    symbol: "NSE:Nifty 50",
+            interval: "1",
 
-    interval: "1",
+            timezone: "Asia/Kolkata",
 
-    timezone: "Asia/Kolkata",
+            locale: "en",
 
-    autosize: true,
+            autosize: true,
 
-    locale: "en",
+            theme: "dark",
 
-    // =====================================================
-    // FEATURES
-    // =====================================================
-    disabled_features: [
-        "use_localstorage_for_settings"
-    ],
+            disabled_features: [
+                "use_localstorage_for_settings"
+            ],
 
-    enabled_features: [
-        "study_templates",
-        "custom_indicators"
-    ],
+            enabled_features: [
+                "study_templates"
+            ]
+        });
 
-    // =====================================================
-    // 🔥 CUSTOM INDICATOR
-    // =====================================================
-    custom_indicators_getter: function(PineJS) {
+        widget.onChartReady(() => {
 
-        console.log("🔥 CUSTOM INDICATOR FUNCTION RUNNING");
+            console.log("TradingView Chart Ready");
 
-        return Promise.resolve([
+            const chart = widget.chart();
 
-            {
+            // Smooth timeframe switching
+            chart.onIntervalChanged().subscribe(null, () => {
 
-                name: "AHLMA",
+                setTimeout(() => {
 
-                metainfo: {
+                    try {
+                        chart.executeActionById("chartAutoScale");
+                        chart.resetData();
 
-                    _metainfoVersion: 53,
+                    } catch (err) {
+                        console.log("Chart refresh error:", err);
+                    }
 
-                    id: "AHLMA@tv-basicstudies-1",
+                }, 100);
 
-                    description: "Average High Low Moving Average",
+            });
 
-                    shortDescription: "AHLMA",
+        });
 
-                    isCustomIndicator: true,
-
-                    is_price_study: true,
-
-                    linkedToSeries: true,
-
-                    format: {
-                        type: "price",
-                        precision: 2
-                    },
-
-                    plots: [
-
-                        {
-                            id: "plot_0",
-                            type: "line"
-                        },
-
-                        {
-                            id: "plot_1",
-                            type: "line"
-                        }
-
-                    ],
-
-                    styles: {
-
-                        plot_0: {
-                            title: "High MA"
-                        },
-
-                        plot_1: {
-                            title: "Low MA"
-                        }
-
-                    },
-
-                    defaults: {
-
-                        styles: {
-
-                            plot_0: {
-                                linestyle: 0,
-                                linewidth: 2,
-                                plottype: 0,
-                                trackPrice: false,
-                                transparency: 0,
-                                visible: true,
-                                color: "#ff0000"
-                            },
-
-                            plot_1: {
-                                linestyle: 0,
-                                linewidth: 2,
-                                plottype: 0,
-                                trackPrice: false,
-                                transparency: 0,
-                                visible: true,
-                                color: "#00ff00"
-                            }
-
-                        },
-
-                        inputs: {
-
-                            length: 20
-
-                        }
-                    },
-
-                    inputs: [
-
-                        {
-                            id: "length",
-                            name: "Length",
-                            type: "integer",
-                            defval: 20,
-                            min: 1,
-                            max: 500
-                        }
-
-                    ]
-                },
-
-                constructor: function() {
-
-                    this.init = function(context, inputCallback) {
-
-                        this._context = context;
-                        this._input = inputCallback;
-
-                        this.highs = [];
-                        this.lows = [];
-
-                    };
-
-                    this.main = function(context, inputCallback) {
-
-                        this._context = context;
-                        this._input = inputCallback;
-
-                        const length = this._input(0);
-
-                        // =====================================================
-                        // 🔥 GET CURRENT BAR DATA
-                        // =====================================================
-                        const high = PineJS.Std.high(this._context);
-
-                        const low = PineJS.Std.low(this._context);
-
-                        // =====================================================
-                        // 🔥 STORE VALUES
-                        // =====================================================
-                        this.highs.push(high);
-
-                        this.lows.push(low);
-
-                        // =====================================================
-                        // 🔥 LIMIT ARRAY SIZE
-                        // =====================================================
-                        if (this.highs.length > length) {
-                            this.highs.shift();
-                        }
-
-                        if (this.lows.length > length) {
-                            this.lows.shift();
-                        }
-
-                        // =====================================================
-                        // 🔥 CALCULATE SMA
-                        // =====================================================
-                        let high_sum = 0;
-
-                        let low_sum = 0;
-
-                        for (let i = 0; i < this.highs.length; i++) {
-
-                            high_sum += this.highs[i];
-
-                        }
-
-                        for (let i = 0; i < this.lows.length; i++) {
-
-                            low_sum += this.lows[i];
-
-                        }
-
-                        const high_ma = high_sum / this.highs.length;
-
-                        const low_ma = low_sum / this.lows.length;
-
-                        // =====================================================
-                        // 🔥 RETURN VALUES
-                        // =====================================================
-                        return [
-
-                            high_ma,
-                            low_ma
-
-                        ];
-                    };
-                }
-            }
-
-        ]);
-    }
-
-});
-
-// =====================================================
-// 🔥 CHART READY
-// =====================================================
-widget.onChartReady(() => {
-
-    console.log("✅ Chart Ready");
-
-    const chart = widget.chart();
-
-    console.log("🔥 Custom Indicator Loaded");
-
-    // =====================================================
-    // 🔥 TF SWITCH FIX
-    // =====================================================
-    chart.onIntervalChanged().subscribe(null, () => {
-
-        setTimeout(() => {
-
-            chart.executeActionById("chartAutoScale");
-
-            chart.executeActionById("chartReset");
-
-        }, 50);
-
-    });
-
-});
-
-</script>
+    </script>
 
 </body>
+
 </html>
