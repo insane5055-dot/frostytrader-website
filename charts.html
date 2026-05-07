@@ -3,9 +3,10 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>TradingView Final Working</title>
 
-    <!-- TradingView -->
+    <title>Frosty Trader Chart</title>
+
+    <!-- TradingView Library -->
     <script src="charting_library/charting_library.js"></script>
 
     <!-- Socket.IO -->
@@ -20,6 +21,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
+            background: #ffffff;
         }
     </style>
 </head>
@@ -32,11 +34,15 @@
 
         import Datafeed from "./src/datafeed.js";
 
+        // =====================================================
+        // CREATE WIDGET
+        // =====================================================
+
         window.tvWidget = new TradingView.widget({
 
-            // =====================================================
-            // BASIC
-            // =====================================================
+            // =================================================
+            // CONTAINER
+            // =================================================
 
             container: "tv",
 
@@ -50,54 +56,51 @@
 
             autosize: true,
 
+            fullscreen: false,
+
             theme: "light",
 
-            // =====================================================
-            // SYMBOL
-            // =====================================================
+            // =================================================
+            // DEFAULT SYMBOL
+            // =================================================
 
             symbol: "NSE:NIFTY 50",
 
             interval: "1",
 
-            // =====================================================
+            // =================================================
             // FEATURES
-            // =====================================================
+            // =================================================
 
-            enabled_features: [
-                "study_templates"
-            ],
+            enabled_features: [],
 
             disabled_features: [
-                "use_localstorage_for_settings"
+
+                "use_localstorage_for_settings",
+
+                "header_symbol_search_hot_key"
             ],
 
-            // =====================================================
-            // STORAGE
-            // =====================================================
-
-            charts_storage_api_version: "1.1",
-
-            client_id: "frostytrader.in",
-
-            user_id: "public_user",
-
-            fullscreen: false,
-
-            // =====================================================
+            // =================================================
             // LOADING SCREEN
-            // =====================================================
+            // =================================================
 
             loading_screen: {
+
                 backgroundColor: "#ffffff",
+
                 foregroundColor: "#2962ff"
             },
 
-            // =====================================================
+            // =================================================
             // OVERRIDES
-            // =====================================================
+            // =================================================
 
             overrides: {
+
+                // =============================================
+                // BACKGROUND
+                // =============================================
 
                 "paneProperties.background": "#ffffff",
 
@@ -105,9 +108,23 @@
 
                 "paneProperties.horzGridProperties.color": "#f0f3fa",
 
-                "symbolWatermarkProperties.transparency": 90,
+                // =============================================
+                // TEXT
+                // =============================================
 
-                "scalesProperties.textColor": "#555",
+                "scalesProperties.textColor": "#000000",
+
+                "paneProperties.crossHairProperties.color": "#000000",
+
+                // =============================================
+                // WATERMARK
+                // =============================================
+
+                "symbolWatermarkProperties.transparency": 0,
+
+                // =============================================
+                // CANDLES
+                // =============================================
 
                 "mainSeriesProperties.candleStyle.upColor": "#26a69a",
 
@@ -119,13 +136,27 @@
 
                 "mainSeriesProperties.candleStyle.wickUpColor": "#26a69a",
 
-                "mainSeriesProperties.candleStyle.wickDownColor": "#ef5350"
+                "mainSeriesProperties.candleStyle.wickDownColor": "#ef5350",
+
+                // =============================================
+                // PRICE LINE
+                // =============================================
+
+                "mainSeriesProperties.priceLineColor": "#2962ff",
+
+                "mainSeriesProperties.showPriceLine": true,
+
+                // =============================================
+                // LAST VALUE
+                // =============================================
+
+                "mainSeriesProperties.showSeriesLastValue": true
             }
         });
 
-        // =========================================================
+        // =====================================================
         // CHART READY
-        // =========================================================
+        // =====================================================
 
         window.tvWidget.onChartReady(() => {
 
@@ -133,9 +164,9 @@
 
             const chart = window.tvWidget.chart();
 
-            // =====================================================
-            // AUTO SCALE FIX
-            // =====================================================
+            // =================================================
+            // TIMEFRAME CHANGE FIX
+            // =================================================
 
             chart.onIntervalChanged().subscribe(null, () => {
 
@@ -157,15 +188,31 @@
                 }, 100);
             });
 
-            // =====================================================
+            // =================================================
             // SYMBOL CHANGE
-            // =====================================================
+            // =================================================
 
             chart.onSymbolChanged().subscribe(null, (symbolInfo) => {
 
                 console.log("📈 Symbol Changed:", symbolInfo);
             });
 
+            // =================================================
+            // AUTO FIT CONTENT
+            // =================================================
+
+            setTimeout(() => {
+
+                try {
+
+                    chart.executeActionById("chartAutoScale");
+
+                } catch (e) {
+
+                    console.log(e);
+                }
+
+            }, 1000);
         });
 
     </script>
