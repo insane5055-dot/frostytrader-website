@@ -1,98 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>TradingView - Final Working Setup</title>
+    <title>TradingView – Final Working Setup</title>
 
     <!-- TradingView Library -->
     <script src="charting_library/charting_library.js"></script>
 
-    <!-- Socket.IO -->
+    <!-- 🔥 ADD THIS (Socket.IO) -->
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 
     <style>
-        html,
-        body,
-        #tv {
+        html, body, #tv {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden;
-        }
-
-        body {
-            background: #131722;
         }
     </style>
 </head>
 
 <body>
+<div id="tv"></div>
 
-    <div id="tv"></div>
+<script type="module">
+    import Datafeed from "./src/datafeed.js";
 
-    <script type="module">
+    const widget = new TradingView.widget({
+        container: "tv",
+        library_path: "charting_library/",
+        datafeed: Datafeed,
 
-        import Datafeed from "./src/datafeed.js";
+        symbol: "NSE:Nifty 50",
+        interval: "1",
 
-        const widget = new TradingView.widget({
-            container: "tv",
+        timezone: "Asia/Kolkata",
+        autosize: true,
+        locale: "en",
 
-            library_path: "./charting_library/",
+        // 🔥 IMPORTANT
+        disabled_features: ["use_localstorage_for_settings"],
+        enabled_features: ["study_templates"]
+    });
 
-            datafeed: Datafeed,
+    widget.onChartReady(() => {
+        const chart = widget.chart();
 
-            symbol: "NSE:NIFTY50",
-
-            interval: "1",
-
-            timezone: "Asia/Kolkata",
-
-            locale: "en",
-
-            autosize: true,
-
-            theme: "dark",
-
-            disabled_features: [
-                "use_localstorage_for_settings"
-            ],
-
-            enabled_features: [
-                "study_templates"
-            ]
+        // 🔥 Smooth TF switching fix
+        chart.onIntervalChanged().subscribe(null, () => {
+            setTimeout(() => {
+                chart.executeActionById("chartAutoScale");
+                chart.executeActionById("chartReset");
+            }, 50);
         });
-
-        widget.onChartReady(() => {
-
-            console.log("TradingView Chart Ready");
-
-            const chart = widget.chart();
-
-            // Smooth timeframe switching
-            chart.onIntervalChanged().subscribe(null, () => {
-
-                setTimeout(() => {
-
-                    try {
-                        chart.executeActionById("chartAutoScale");
-                        chart.resetData();
-
-                    } catch (err) {
-                        console.log("Chart refresh error:", err);
-                    }
-
-                }, 100);
-
-            });
-
-        });
-
-    </script>
-
+    });
+</script>
 </body>
-
 </html>
