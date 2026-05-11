@@ -23,12 +23,59 @@
             overflow: hidden;
             background: #ffffff;
         }
+
+        /* =====================================================
+           🔥 EMA FLOAT LABEL
+        ===================================================== */
+        #emaBox {
+
+            position: absolute;
+
+            top: 10px;
+
+            right: 10px;
+
+            z-index: 9999;
+
+            background: rgba(255, 255, 255, 0.95);
+
+            border: 1px solid #ddd;
+
+            border-radius: 8px;
+
+            padding: 8px 12px;
+
+            font-family: Arial;
+
+            font-size: 14px;
+
+            color: #000;
+
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        #emaValue {
+
+            color: #2962ff;
+
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
 
     <div id="tv"></div>
+
+    <!-- =====================================================
+         🔥 LIVE EMA VALUE BOX
+    ====================================================== -->
+    <div id="emaBox">
+
+        Tick EMA:
+        <span id="emaValue">--</span>
+
+    </div>
 
     <script type="module">
 
@@ -163,6 +210,38 @@
             console.log("✅ TradingView Ready");
 
             const chart = window.tvWidget.chart();
+
+            // =================================================
+            // SOCKET.IO
+            // =================================================
+
+            const socket = io("http://localhost:5000");
+
+            console.log("🔥 Socket Connecting...");
+
+            // =================================================
+            // LIVE TICK EMA
+            // =================================================
+
+            socket.on("connect", () => {
+
+                console.log("✅ Socket Connected");
+
+            });
+
+            socket.on("tick_ema", (data) => {
+
+                console.log("🔥 LIVE TICK EMA:", data);
+
+                // =================================================
+                // UPDATE FLOAT BOX
+                // =================================================
+
+                document.getElementById(
+                    "emaValue"
+                ).innerText = data.ema;
+
+            });
 
             // =================================================
             // TIMEFRAME CHANGE FIX
