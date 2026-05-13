@@ -2,230 +2,47 @@
 <html>
 
 <head>
-
     <meta charset="UTF-8" />
 
     <title>Frosty Trader Chart</title>
 
-    <!-- ================================================= -->
     <!-- TradingView Library -->
-    <!-- ================================================= -->
-
     <script src="charting_library/charting_library.js"></script>
 
-    <!-- ================================================= -->
     <!-- Socket.IO -->
-    <!-- ================================================= -->
-
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
-    <!-- ================================================= -->
-    <!-- STYLE -->
-    <!-- ================================================= -->
-
     <style>
-
         html,
         body,
         #tv {
-
             margin: 0;
-
             padding: 0;
-
             width: 100%;
-
             height: 100%;
-
             overflow: hidden;
-
             background: #ffffff;
         }
-
-        /* ================================================= */
-        /* LIVE EMA BOX */
-        /* ================================================= */
-
-        #tick-ema-box {
-
-            position: absolute;
-
-            top: 12px;
-
-            right: 70px;
-
-            z-index: 99999;
-
-            background: rgba(255, 255, 255, 0.96);
-
-            border: 1px solid #dcdcdc;
-
-            border-radius: 12px;
-
-            padding: 12px 16px;
-
-            font-family: Arial;
-
-            font-size: 14px;
-
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
-
-            min-width: 210px;
-
-            backdrop-filter: blur(6px);
-        }
-
-        #tick-ema-box .row {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            margin-bottom: 10px;
-        }
-
-        #tick-ema-box .row:last-child {
-
-            margin-bottom: 0;
-        }
-
-        .label {
-
-            color: #666;
-
-            font-weight: 600;
-        }
-
-        #live-price {
-
-            font-weight: bold;
-
-            font-size: 15px;
-
-            color: #2962ff;
-        }
-
-        #live-ema {
-
-            font-weight: bold;
-
-            font-size: 15px;
-
-            color: #ff6d00;
-        }
-
-        #signal {
-
-            font-weight: bold;
-
-            font-size: 14px;
-
-            padding: 4px 10px;
-
-            border-radius: 6px;
-
-            color: white;
-
-            background: gray;
-        }
-
     </style>
-
 </head>
 
 <body>
 
-    <!-- ================================================= -->
-    <!-- CHART -->
-    <!-- ================================================= -->
-
     <div id="tv"></div>
-
-    <!-- ================================================= -->
-    <!-- LIVE EMA BOX -->
-    <!-- ================================================= -->
-
-    <div id="tick-ema-box">
-
-        <div class="row">
-
-            <span class="label">
-                PRICE
-            </span>
-
-            <span id="live-price">
-                0
-            </span>
-
-        </div>
-
-        <div class="row">
-
-            <span class="label">
-                TICK EMA
-            </span>
-
-            <span id="live-ema">
-                0
-            </span>
-
-        </div>
-
-        <div class="row">
-
-            <span class="label">
-                SIGNAL
-            </span>
-
-            <span id="signal">
-                WAIT
-            </span>
-
-        </div>
-
-    </div>
-
-    <!-- ================================================= -->
-    <!-- SCRIPT -->
-    <!-- ================================================= -->
 
     <script type="module">
 
         import Datafeed from "./src/datafeed.js";
 
         // =====================================================
-        // SOCKET CONNECTION
-        // =====================================================
-
-        const socket = io(
-            "https://frosty-backend-4mox.onrender.com"
-        );
-
-        // =====================================================
-        // SOCKET CONNECTED
-        // =====================================================
-
-        socket.on("connect", () => {
-
-            console.log("✅ SOCKET CONNECTED");
-        });
-
-        // =====================================================
-        // SOCKET ERROR
-        // =====================================================
-
-        socket.on("connect_error", (err) => {
-
-            console.log("❌ SOCKET ERROR:", err);
-        });
-
-        // =====================================================
-        // CREATE TRADINGVIEW WIDGET
+        // CREATE WIDGET
         // =====================================================
 
         window.tvWidget = new TradingView.widget({
+
+            // =================================================
+            // CONTAINER
+            // =================================================
 
             container: "tv",
 
@@ -243,9 +60,17 @@
 
             theme: "light",
 
+            // =================================================
+            // DEFAULT SYMBOL
+            // =================================================
+
             symbol: "NSE:NIFTY 50",
 
             interval: "1",
+
+            // =================================================
+            // FEATURES
+            // =================================================
 
             enabled_features: [],
 
@@ -256,12 +81,20 @@
                 "header_symbol_search_hot_key"
             ],
 
+            // =================================================
+            // LOADING SCREEN
+            // =================================================
+
             loading_screen: {
 
                 backgroundColor: "#ffffff",
 
                 foregroundColor: "#2962ff"
             },
+
+            // =================================================
+            // OVERRIDES
+            // =================================================
 
             overrides: {
 
@@ -290,7 +123,7 @@
                 "symbolWatermarkProperties.transparency": 0,
 
                 // =============================================
-                // CANDLE COLORS
+                // CANDLES
                 // =============================================
 
                 "mainSeriesProperties.candleStyle.upColor": "#26a69a",
@@ -332,142 +165,54 @@
             const chart = window.tvWidget.chart();
 
             // =================================================
-            // LIVE EMA UPDATE
+            // TIMEFRAME CHANGE FIX
             // =================================================
 
-            socket.on("tick_ema", (data) => {
+            chart.onIntervalChanged().subscribe(null, () => {
 
-                console.log("LIVE:", data);
+                console.log("⏱ Timeframe Changed");
 
-                const priceEl =
-                    document.getElementById(
-                        "live-price"
-                    );
+                setTimeout(() => {
 
-                const emaEl =
-                    document.getElementById(
-                        "live-ema"
-                    );
+                    try {
 
-                const signalEl =
-                    document.getElementById(
-                        "signal"
-                    );
+                        chart.executeActionById("chartAutoScale");
 
-                const price =
-                    parseFloat(data.price);
+                        chart.executeActionById("chartReset");
 
-                const ema =
-                    parseFloat(data.ema);
+                    } catch (e) {
 
-                // =============================================
-                // UPDATE VALUES
-                // =============================================
+                        console.log("AutoScale Error:", e);
+                    }
 
-                priceEl.innerText =
-                    price.toFixed(2);
-
-                emaEl.innerText =
-                    ema.toFixed(2);
-
-                // =============================================
-                // BUY
-                // =============================================
-
-                if (price > ema) {
-
-                    priceEl.style.color =
-                        "#00b386";
-
-                    signalEl.innerText =
-                        "BUY";
-
-                    signalEl.style.background =
-                        "#00b386";
-                }
-
-                // =============================================
-                // SELL
-                // =============================================
-
-                else if (price < ema) {
-
-                    priceEl.style.color =
-                        "#ff4d4f";
-
-                    signalEl.innerText =
-                        "SELL";
-
-                    signalEl.style.background =
-                        "#ff4d4f";
-                }
-
-                // =============================================
-                // WAIT
-                // =============================================
-
-                else {
-
-                    priceEl.style.color =
-                        "#2962ff";
-
-                    signalEl.innerText =
-                        "WAIT";
-
-                    signalEl.style.background =
-                        "gray";
-                }
+                }, 100);
             });
-
-            // =================================================
-            // INTERVAL CHANGE
-            // =================================================
-
-            chart.onIntervalChanged().subscribe(
-
-                null,
-
-                () => {
-
-                    console.log(
-                        "⏱ Timeframe Changed"
-                    );
-
-                    setTimeout(() => {
-
-                        try {
-
-                            chart.executeActionById(
-                                "chartReset"
-                            );
-
-                        }
-
-                        catch (e) {
-
-                            console.log(e);
-                        }
-
-                    }, 100);
-                }
-            );
 
             // =================================================
             // SYMBOL CHANGE
             // =================================================
 
-            chart.onSymbolChanged().subscribe(
+            chart.onSymbolChanged().subscribe(null, (symbolInfo) => {
 
-                null,
+                console.log("📈 Symbol Changed:", symbolInfo);
+            });
 
-                (symbolInfo) => {
+            // =================================================
+            // AUTO FIT CONTENT
+            // =================================================
 
-                    console.log(
-                        "📈 Symbol Changed:",
-                        symbolInfo
-                    );
+            setTimeout(() => {
+
+                try {
+
+                    chart.executeActionById("chartAutoScale");
+
+                } catch (e) {
+
+                    console.log(e);
                 }
-            );
+
+            }, 1000);
         });
 
     </script>
