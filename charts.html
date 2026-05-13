@@ -2,111 +2,47 @@
 <html>
 
 <head>
-
     <meta charset="UTF-8" />
 
     <title>Frosty Trader Chart</title>
 
-    <!-- TradingView -->
+    <!-- TradingView Library -->
     <script src="charting_library/charting_library.js"></script>
 
     <!-- Socket.IO -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
     <style>
-
         html,
-        body {
-
+        body,
+        #tv {
             margin: 0;
             padding: 0;
-
             width: 100%;
             height: 100%;
-
             overflow: hidden;
-
             background: #ffffff;
         }
-
-        #chart-container {
-
-            position: relative;
-
-            width: 100%;
-            height: 100%;
-        }
-
-        #tv {
-
-            position: absolute;
-
-            top: 0;
-            left: 0;
-
-            width: 100%;
-            height: 100%;
-
-            z-index: 1;
-        }
-
-        #emaCanvas {
-
-            position: absolute;
-
-            top: 0;
-            left: 0;
-
-            width: 100%;
-            height: 100%;
-
-            z-index: 9999;
-
-            pointer-events: none;
-        }
-
     </style>
-
 </head>
 
 <body>
 
-    <div id="chart-container">
-
-        <div id="tv"></div>
-
-        <canvas id="emaCanvas"></canvas>
-
-    </div>
+    <div id="tv"></div>
 
     <script type="module">
 
         import Datafeed from "./src/datafeed.js";
 
         // =====================================================
-        // SOCKET.IO
-        // =====================================================
-
-        const socket = io({
-
-            transports: ["websocket"],
-
-            upgrade: false
-        });
-
-        // =====================================================
-        // STORAGE
-        // =====================================================
-
-        let emaData = [];
-
-        let tickData = [];
-
-        // =====================================================
-        // TRADINGVIEW
+        // CREATE WIDGET
         // =====================================================
 
         window.tvWidget = new TradingView.widget({
+
+            // =================================================
+            // CONTAINER
+            // =================================================
 
             container: "tv",
 
@@ -124,9 +60,17 @@
 
             theme: "light",
 
+            // =================================================
+            // DEFAULT SYMBOL
+            // =================================================
+
             symbol: "NSE:NIFTY 50",
 
             interval: "1",
+
+            // =================================================
+            // FEATURES
+            // =================================================
 
             enabled_features: [],
 
@@ -137,6 +81,10 @@
                 "header_symbol_search_hot_key"
             ],
 
+            // =================================================
+            // LOADING SCREEN
+            // =================================================
+
             loading_screen: {
 
                 backgroundColor: "#ffffff",
@@ -144,11 +92,15 @@
                 foregroundColor: "#2962ff"
             },
 
+            // =================================================
+            // OVERRIDES
+            // =================================================
+
             overrides: {
 
-                // =================================================
+                // =============================================
                 // BACKGROUND
-                // =================================================
+                // =============================================
 
                 "paneProperties.background": "#ffffff",
 
@@ -156,23 +108,23 @@
 
                 "paneProperties.horzGridProperties.color": "#f0f3fa",
 
-                // =================================================
+                // =============================================
                 // TEXT
-                // =================================================
+                // =============================================
 
                 "scalesProperties.textColor": "#000000",
 
                 "paneProperties.crossHairProperties.color": "#000000",
 
-                // =================================================
+                // =============================================
                 // WATERMARK
-                // =================================================
+                // =============================================
 
                 "symbolWatermarkProperties.transparency": 0,
 
-                // =================================================
+                // =============================================
                 // CANDLES
-                // =================================================
+                // =============================================
 
                 "mainSeriesProperties.candleStyle.upColor": "#26a69a",
 
@@ -186,17 +138,17 @@
 
                 "mainSeriesProperties.candleStyle.wickDownColor": "#ef5350",
 
-                // =================================================
+                // =============================================
                 // PRICE LINE
-                // =================================================
+                // =============================================
 
                 "mainSeriesProperties.priceLineColor": "#2962ff",
 
                 "mainSeriesProperties.showPriceLine": true,
 
-                // =================================================
+                // =============================================
                 // LAST VALUE
-                // =================================================
+                // =============================================
 
                 "mainSeriesProperties.showSeriesLastValue": true
             }
@@ -213,205 +165,54 @@
             const chart = window.tvWidget.chart();
 
             // =================================================
-            // EMA CANVAS
+            // TIMEFRAME CHANGE FIX
             // =================================================
 
-            const canvas = document.getElementById("emaCanvas");
+            chart.onIntervalChanged().subscribe(null, () => {
 
-            const ctx = canvas.getContext("2d");
+                console.log("⏱ Timeframe Changed");
 
-            // =================================================
-            // RESIZE
-            // =================================================
+                setTimeout(() => {
 
-            function resizeCanvas() {
+                    try {
 
-                canvas.width = window.innerWidth;
+                        chart.executeActionById("chartAutoScale");
 
-                canvas.height = window.innerHeight;
+                        chart.executeActionById("chartReset");
 
-                drawEMA();
-            }
+                    } catch (e) {
 
-            resizeCanvas();
-
-            window.addEventListener(
-                "resize",
-                resizeCanvas
-            );
-
-            // =================================================
-            // SOCKET CONNECT
-            // =================================================
-
-            socket.on("connect", () => {
-
-                console.log("🟢 WebSocket Connected");
-            });
-
-            socket.on("disconnect", () => {
-
-                console.log("🔴 WebSocket Disconnected");
-            });
-
-            socket.on("connect_error", (err) => {
-
-                console.log(
-                    "❌ Socket Error:",
-                    err
-                );
-            });
-
-            // =================================================
-            // RECEIVE EMA
-            // =================================================
-
-            socket.on("tick_ema", (data) => {
-
-                // =============================================
-                // DEBUG
-                // =============================================
-
-                console.log("EMA:", data);
-
-                // =============================================
-                // STORE
-                // =============================================
-
-                emaData.push(data.ema);
-
-                tickData.push(data.price);
-
-                // =============================================
-                // LIMIT
-                // =============================================
-
-                if (emaData.length > 1000) {
-
-                    emaData.shift();
-
-                    tickData.shift();
-                }
-
-                // =============================================
-                // DRAW
-                // =============================================
-
-                drawEMA();
-            });
-
-            // =================================================
-            // DRAW EMA
-            // =================================================
-
-            function drawEMA() {
-
-                ctx.clearRect(
-
-                    0,
-                    0,
-                    canvas.width,
-                    canvas.height
-                );
-
-                if (emaData.length < 2)
-                    return;
-
-                // =============================================
-                // PRICE RANGE
-                // =============================================
-
-                const maxPrice = Math.max(
-                    ...tickData
-                );
-
-                const minPrice = Math.min(
-                    ...tickData
-                );
-
-                const range = (
-                    maxPrice - minPrice
-                );
-
-                if (range <= 0)
-                    return;
-
-                // =============================================
-                // EMA STYLE
-                // =============================================
-
-                ctx.beginPath();
-
-                ctx.lineWidth = 2;
-
-                ctx.strokeStyle = "#2962ff";
-
-                // =============================================
-                // DRAW LINE
-                // =============================================
-
-                emaData.forEach((ema, index) => {
-
-                    const x = (
-
-                        index / (emaData.length - 1)
-
-                    ) * canvas.width;
-
-                    const y = (
-
-                        canvas.height -
-
-                        (
-                            (
-                                ema - minPrice
-                            ) / range
-                        ) * canvas.height
-
-                    );
-
-                    if (index === 0) {
-
-                        ctx.moveTo(x, y);
-
-                    } else {
-
-                        ctx.lineTo(x, y);
+                        console.log("AutoScale Error:", e);
                     }
-                });
 
-                ctx.stroke();
-            }
+                }, 100);
+            });
 
             // =================================================
             // SYMBOL CHANGE
             // =================================================
 
-            chart.onSymbolChanged().subscribe(
+            chart.onSymbolChanged().subscribe(null, (symbolInfo) => {
 
-                null,
+                console.log("📈 Symbol Changed:", symbolInfo);
+            });
 
-                (symbolInfo) => {
+            // =================================================
+            // AUTO FIT CONTENT
+            // =================================================
 
-                    console.log(
-                        "📈 Symbol Changed:",
-                        symbolInfo
-                    );
+            setTimeout(() => {
 
-                    emaData = [];
+                try {
 
-                    tickData = [];
+                    chart.executeActionById("chartAutoScale");
 
-                    ctx.clearRect(
+                } catch (e) {
 
-                        0,
-                        0,
-                        canvas.width,
-                        canvas.height
-                    );
+                    console.log(e);
                 }
-            );
 
+            }, 1000);
         });
 
     </script>
