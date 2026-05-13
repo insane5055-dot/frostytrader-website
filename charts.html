@@ -23,16 +23,159 @@
             overflow: hidden;
             background: #ffffff;
         }
+
+        /* ================================================= */
+        /* TICK EMA BOX */
+        /* ================================================= */
+
+        #tick-ema-box {
+
+            position: absolute;
+
+            top: 12px;
+
+            right: 70px;
+
+            z-index: 99999;
+
+            background: rgba(255, 255, 255, 0.96);
+
+            border: 1px solid #dcdcdc;
+
+            border-radius: 12px;
+
+            padding: 12px 16px;
+
+            font-family: Arial;
+
+            font-size: 14px;
+
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+
+            min-width: 190px;
+
+            backdrop-filter: blur(6px);
+        }
+
+        #tick-ema-box .row {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 10px;
+        }
+
+        #tick-ema-box .row:last-child {
+
+            margin-bottom: 0;
+        }
+
+        .label {
+
+            color: #666;
+
+            font-weight: 600;
+        }
+
+        #live-price {
+
+            font-weight: bold;
+
+            font-size: 15px;
+
+            color: #2962ff;
+        }
+
+        #live-ema {
+
+            font-weight: bold;
+
+            font-size: 15px;
+
+            color: #ff6d00;
+        }
+
+        #signal {
+
+            font-weight: bold;
+
+            font-size: 14px;
+
+            padding: 4px 10px;
+
+            border-radius: 6px;
+
+            color: white;
+
+            background: gray;
+        }
     </style>
 </head>
 
 <body>
 
+    <!-- ================================================= -->
+    <!-- TV CHART -->
+    <!-- ================================================= -->
+
     <div id="tv"></div>
+
+    <!-- ================================================= -->
+    <!-- TICK EMA BOX -->
+    <!-- ================================================= -->
+
+    <div id="tick-ema-box">
+
+        <div class="row">
+
+            <span class="label">
+                PRICE
+            </span>
+
+            <span id="live-price">
+                0
+            </span>
+
+        </div>
+
+        <div class="row">
+
+            <span class="label">
+                TICK EMA
+            </span>
+
+            <span id="live-ema">
+                0
+            </span>
+
+        </div>
+
+        <div class="row">
+
+            <span class="label">
+                SIGNAL
+            </span>
+
+            <span id="signal">
+                WAIT
+            </span>
+
+        </div>
+
+    </div>
 
     <script type="module">
 
         import Datafeed from "./src/datafeed.js";
+
+        // =====================================================
+        // SOCKET.IO
+        // =====================================================
+
+        const socket = io("http://localhost:5000");
 
         // =====================================================
         // CREATE WIDGET
@@ -165,6 +308,68 @@
             const chart = window.tvWidget.chart();
 
             // =================================================
+            // SOCKET LIVE EMA
+            // =================================================
+
+            socket.on("tick_ema", (data) => {
+
+                const priceEl = document.getElementById("live-price");
+
+                const emaEl = document.getElementById("live-ema");
+
+                const signalEl = document.getElementById("signal");
+
+                const price = parseFloat(data.price);
+
+                const ema = parseFloat(data.ema);
+
+                // =============================================
+                // UPDATE VALUES
+                // =============================================
+
+                priceEl.innerText = price.toFixed(2);
+
+                emaEl.innerText = ema.toFixed(2);
+
+                // =============================================
+                // BUY SIGNAL
+                // =============================================
+
+                if (price > ema) {
+
+                    priceEl.style.color = "#00b386";
+
+                    signalEl.innerText = "BUY";
+
+                    signalEl.style.background = "#00b386";
+                }
+
+                // =============================================
+                // SELL SIGNAL
+                // =============================================
+
+                else if (price < ema) {
+
+                    priceEl.style.color = "#ff4d4f";
+
+                    signalEl.innerText = "SELL";
+
+                    signalEl.style.background = "#ff4d4f";
+                }
+
+                // =============================================
+                // WAIT SIGNAL
+                // =============================================
+
+                else {
+
+                    signalEl.innerText = "WAIT";
+
+                    signalEl.style.background = "gray";
+                }
+            });
+
+            // =================================================
             // TIMEFRAME CHANGE FIX
             // =================================================
 
@@ -180,7 +385,9 @@
 
                         chart.executeActionById("chartReset");
 
-                    } catch (e) {
+                    }
+
+                    catch (e) {
 
                         console.log("AutoScale Error:", e);
                     }
@@ -207,7 +414,9 @@
 
                     chart.executeActionById("chartAutoScale");
 
-                } catch (e) {
+                }
+
+                catch (e) {
 
                     console.log(e);
                 }
