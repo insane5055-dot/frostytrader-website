@@ -89,19 +89,21 @@
 
         const socket = io({
 
-            transports: ["websocket", "polling"]
+            transports: ["websocket"],
+
+            upgrade: false
         });
 
         // =====================================================
-        // EMA STORAGE
+        // STORAGE
         // =====================================================
 
-        const emaData = [];
+        let emaData = [];
 
-        const priceData = [];
+        let tickData = [];
 
         // =====================================================
-        // CREATE TRADINGVIEW
+        // TRADINGVIEW
         // =====================================================
 
         window.tvWidget = new TradingView.widget({
@@ -169,7 +171,7 @@
                 "symbolWatermarkProperties.transparency": 0,
 
                 // =================================================
-                // CANDLE STYLE
+                // CANDLES
                 // =================================================
 
                 "mainSeriesProperties.candleStyle.upColor": "#26a69a",
@@ -227,6 +229,8 @@
                 canvas.width = window.innerWidth;
 
                 canvas.height = window.innerHeight;
+
+                drawEMA();
             }
 
             resizeCanvas();
@@ -250,6 +254,14 @@
                 console.log("🔴 WebSocket Disconnected");
             });
 
+            socket.on("connect_error", (err) => {
+
+                console.log(
+                    "❌ Socket Error:",
+                    err
+                );
+            });
+
             // =================================================
             // RECEIVE EMA
             // =================================================
@@ -263,17 +275,12 @@
                 console.log("EMA:", data);
 
                 // =============================================
-                // STORE DATA
+                // STORE
                 // =============================================
 
-                emaData.push({
+                emaData.push(data.ema);
 
-                    time: data.time,
-
-                    value: data.ema
-                });
-
-                priceData.push(data.price);
+                tickData.push(data.price);
 
                 // =============================================
                 // LIMIT
@@ -283,7 +290,7 @@
 
                     emaData.shift();
 
-                    priceData.shift();
+                    tickData.shift();
                 }
 
                 // =============================================
@@ -314,17 +321,23 @@
                 // PRICE RANGE
                 // =============================================
 
-                const maxPrice = Math.max(...priceData);
+                const maxPrice = Math.max(
+                    ...tickData
+                );
 
-                const minPrice = Math.min(...priceData);
+                const minPrice = Math.min(
+                    ...tickData
+                );
 
-                const range = maxPrice - minPrice;
+                const range = (
+                    maxPrice - minPrice
+                );
 
                 if (range <= 0)
                     return;
 
                 // =============================================
-                // STYLE
+                // EMA STYLE
                 // =============================================
 
                 ctx.beginPath();
@@ -337,7 +350,7 @@
                 // DRAW LINE
                 // =============================================
 
-                emaData.forEach((point, index) => {
+                emaData.forEach((ema, index) => {
 
                     const x = (
 
@@ -351,7 +364,7 @@
 
                         (
                             (
-                                point.value - minPrice
+                                ema - minPrice
                             ) / range
                         ) * canvas.height
 
@@ -385,9 +398,9 @@
                         symbolInfo
                     );
 
-                    emaData.length = 0;
+                    emaData = [];
 
-                    priceData.length = 0;
+                    tickData = [];
 
                     ctx.clearRect(
 
