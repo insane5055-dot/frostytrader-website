@@ -2,25 +2,43 @@
 <html>
 
 <head>
+
     <meta charset="UTF-8" />
 
     <title>Frosty Trader Chart</title>
 
-    <!-- TradingView Library -->
+    <!-- ================================================= -->
+    <!-- TRADINGVIEW -->
+    <!-- ================================================= -->
+
     <script src="charting_library/charting_library.js"></script>
 
-    <!-- Socket.IO -->
+    <!-- ================================================= -->
+    <!-- SOCKET.IO -->
+    <!-- ================================================= -->
+
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
+    <!-- ================================================= -->
+    <!-- STYLE -->
+    <!-- ================================================= -->
+
     <style>
+
         html,
         body,
         #tv {
+
             margin: 0;
+
             padding: 0;
+
             width: 100%;
+
             height: 100%;
+
             overflow: hidden;
+
             background: #ffffff;
         }
 
@@ -112,7 +130,9 @@
 
             background: gray;
         }
+
     </style>
+
 </head>
 
 <body>
@@ -124,7 +144,7 @@
     <div id="tv"></div>
 
     <!-- ================================================= -->
-    <!-- TICK EMA BOX -->
+    <!-- LIVE EMA BOX -->
     <!-- ================================================= -->
 
     <div id="tick-ema-box">
@@ -167,15 +187,45 @@
 
     </div>
 
+    <!-- ================================================= -->
+    <!-- SCRIPT -->
+    <!-- ================================================= -->
+
     <script type="module">
 
         import Datafeed from "./src/datafeed.js";
 
         // =====================================================
-        // SOCKET.IO
+        // SOCKET.IO CONNECTION
         // =====================================================
 
-        const socket = io("http://localhost:5000");
+        const socket = io(
+            "https://frosty-backend.onrender.com",
+            {
+
+                transports: ["websocket"],
+
+                upgrade: false
+            }
+        );
+
+        // =====================================================
+        // SOCKET CONNECTED
+        // =====================================================
+
+        socket.on("connect", () => {
+
+            console.log("✅ SOCKET CONNECTED");
+        });
+
+        // =====================================================
+        // SOCKET ERROR
+        // =====================================================
+
+        socket.on("connect_error", (err) => {
+
+            console.log("❌ SOCKET ERROR:", err);
+        });
 
         // =====================================================
         // CREATE WIDGET
@@ -308,28 +358,37 @@
             const chart = window.tvWidget.chart();
 
             // =================================================
-            // SOCKET LIVE EMA
+            // LIVE TICK EMA
             // =================================================
 
             socket.on("tick_ema", (data) => {
 
-                const priceEl = document.getElementById("live-price");
+                console.log("LIVE:", data);
 
-                const emaEl = document.getElementById("live-ema");
+                const priceEl =
+                    document.getElementById("live-price");
 
-                const signalEl = document.getElementById("signal");
+                const emaEl =
+                    document.getElementById("live-ema");
 
-                const price = parseFloat(data.price);
+                const signalEl =
+                    document.getElementById("signal");
 
-                const ema = parseFloat(data.ema);
+                const price =
+                    parseFloat(data.price);
+
+                const ema =
+                    parseFloat(data.ema);
 
                 // =============================================
                 // UPDATE VALUES
                 // =============================================
 
-                priceEl.innerText = price.toFixed(2);
+                priceEl.innerText =
+                    price.toFixed(2);
 
-                emaEl.innerText = ema.toFixed(2);
+                emaEl.innerText =
+                    ema.toFixed(2);
 
                 // =============================================
                 // BUY SIGNAL
@@ -341,7 +400,8 @@
 
                     signalEl.innerText = "BUY";
 
-                    signalEl.style.background = "#00b386";
+                    signalEl.style.background =
+                        "#00b386";
                 }
 
                 // =============================================
@@ -354,7 +414,8 @@
 
                     signalEl.innerText = "SELL";
 
-                    signalEl.style.background = "#ff4d4f";
+                    signalEl.style.background =
+                        "#ff4d4f";
                 }
 
                 // =============================================
@@ -363,56 +424,83 @@
 
                 else {
 
+                    priceEl.style.color = "#2962ff";
+
                     signalEl.innerText = "WAIT";
 
-                    signalEl.style.background = "gray";
+                    signalEl.style.background =
+                        "gray";
                 }
             });
 
             // =================================================
-            // TIMEFRAME CHANGE FIX
+            // TIMEFRAME CHANGE
             // =================================================
 
-            chart.onIntervalChanged().subscribe(null, () => {
+            chart.onIntervalChanged().subscribe(
 
-                console.log("⏱ Timeframe Changed");
+                null,
 
-                setTimeout(() => {
+                () => {
 
-                    try {
+                    console.log(
+                        "⏱ Timeframe Changed"
+                    );
 
-                        chart.executeActionById("chartAutoScale");
+                    setTimeout(() => {
 
-                        chart.executeActionById("chartReset");
+                        try {
 
-                    }
+                            chart.executeActionById(
+                                "chartAutoScale"
+                            );
 
-                    catch (e) {
+                            chart.executeActionById(
+                                "chartReset"
+                            );
 
-                        console.log("AutoScale Error:", e);
-                    }
+                        }
 
-                }, 100);
-            });
+                        catch (e) {
+
+                            console.log(
+                                "AutoScale Error:",
+                                e
+                            );
+                        }
+
+                    }, 100);
+                }
+            );
 
             // =================================================
             // SYMBOL CHANGE
             // =================================================
 
-            chart.onSymbolChanged().subscribe(null, (symbolInfo) => {
+            chart.onSymbolChanged().subscribe(
 
-                console.log("📈 Symbol Changed:", symbolInfo);
-            });
+                null,
+
+                (symbolInfo) => {
+
+                    console.log(
+                        "📈 Symbol Changed:",
+                        symbolInfo
+                    );
+                }
+            );
 
             // =================================================
-            // AUTO FIT CONTENT
+            // AUTO FIT
             // =================================================
 
             setTimeout(() => {
 
                 try {
 
-                    chart.executeActionById("chartAutoScale");
+                    chart.executeActionById(
+                        "chartAutoScale"
+                    );
 
                 }
 
