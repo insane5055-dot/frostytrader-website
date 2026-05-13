@@ -2,7 +2,6 @@
 <html>
 
 <head>
-
     <meta charset="UTF-8" />
 
     <title>Frosty Trader Chart</title>
@@ -14,62 +13,21 @@
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
     <style>
-
         html,
         body,
         #tv {
-
             margin: 0;
             padding: 0;
-
             width: 100%;
             height: 100%;
-
             overflow: hidden;
-
             background: #ffffff;
         }
-
-        #ema_value {
-
-            position: absolute;
-
-            top: 10px;
-            left: 10px;
-
-            z-index: 9999;
-
-            background: white;
-
-            padding: 6px 12px;
-
-            border-radius: 8px;
-
-            font-family: Arial;
-
-            font-size: 14px;
-
-            font-weight: bold;
-
-            color: #2962ff;
-
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-        }
-
     </style>
-
 </head>
 
 <body>
 
-    <!-- EMA BOX -->
-    <div id="ema_value">
-
-        EMA 20 : Loading...
-
-    </div>
-
-    <!-- CHART -->
     <div id="tv"></div>
 
     <script type="module">
@@ -77,30 +35,7 @@
         import Datafeed from "./src/datafeed.js";
 
         // =====================================================
-        // SOCKET.IO
-        // =====================================================
-
-        const socket = io("https://frostytrader.in", {
-
-            transports: ["websocket"],
-
-            secure: true,
-
-            reconnection: true,
-
-            reconnectionAttempts: Infinity,
-
-            reconnectionDelay: 1000
-        });
-
-        // =====================================================
-        // GLOBALS
-        // =====================================================
-
-        let emaStudy = null;
-
-        // =====================================================
-        // CREATE TRADINGVIEW WIDGET
+        // CREATE WIDGET
         // =====================================================
 
         window.tvWidget = new TradingView.widget({
@@ -167,70 +102,55 @@
                 // BACKGROUND
                 // =============================================
 
-                "paneProperties.background":
-                "#ffffff",
+                "paneProperties.background": "#ffffff",
 
-                "paneProperties.vertGridProperties.color":
-                "#f0f3fa",
+                "paneProperties.vertGridProperties.color": "#f0f3fa",
 
-                "paneProperties.horzGridProperties.color":
-                "#f0f3fa",
+                "paneProperties.horzGridProperties.color": "#f0f3fa",
 
                 // =============================================
                 // TEXT
                 // =============================================
 
-                "scalesProperties.textColor":
-                "#000000",
+                "scalesProperties.textColor": "#000000",
 
-                "paneProperties.crossHairProperties.color":
-                "#000000",
+                "paneProperties.crossHairProperties.color": "#000000",
 
                 // =============================================
                 // WATERMARK
                 // =============================================
 
-                "symbolWatermarkProperties.transparency":
-                0,
+                "symbolWatermarkProperties.transparency": 0,
 
                 // =============================================
                 // CANDLES
                 // =============================================
 
-                "mainSeriesProperties.candleStyle.upColor":
-                "#26a69a",
+                "mainSeriesProperties.candleStyle.upColor": "#26a69a",
 
-                "mainSeriesProperties.candleStyle.downColor":
-                "#ef5350",
+                "mainSeriesProperties.candleStyle.downColor": "#ef5350",
 
-                "mainSeriesProperties.candleStyle.borderUpColor":
-                "#26a69a",
+                "mainSeriesProperties.candleStyle.borderUpColor": "#26a69a",
 
-                "mainSeriesProperties.candleStyle.borderDownColor":
-                "#ef5350",
+                "mainSeriesProperties.candleStyle.borderDownColor": "#ef5350",
 
-                "mainSeriesProperties.candleStyle.wickUpColor":
-                "#26a69a",
+                "mainSeriesProperties.candleStyle.wickUpColor": "#26a69a",
 
-                "mainSeriesProperties.candleStyle.wickDownColor":
-                "#ef5350",
+                "mainSeriesProperties.candleStyle.wickDownColor": "#ef5350",
 
                 // =============================================
                 // PRICE LINE
                 // =============================================
 
-                "mainSeriesProperties.priceLineColor":
-                "#2962ff",
+                "mainSeriesProperties.priceLineColor": "#2962ff",
 
-                "mainSeriesProperties.showPriceLine":
-                true,
+                "mainSeriesProperties.showPriceLine": true,
 
                 // =============================================
                 // LAST VALUE
                 // =============================================
 
-                "mainSeriesProperties.showSeriesLastValue":
-                true
+                "mainSeriesProperties.showSeriesLastValue": true
             }
         });
 
@@ -245,96 +165,47 @@
             const chart = window.tvWidget.chart();
 
             // =================================================
-            // CREATE EMA STUDY
+            // TIMEFRAME CHANGE FIX
             // =================================================
 
-            try {
+            chart.onIntervalChanged().subscribe(null, () => {
 
-                emaStudy = chart.createStudy(
+                console.log("⏱ Timeframe Changed");
 
-                    "Moving Average Exponential",
+                setTimeout(() => {
 
-                    false,
-                    false,
+                    try {
 
-                    [20],
+                        chart.executeActionById("chartAutoScale");
 
-                    null,
+                        chart.executeActionById("chartReset");
 
-                    {
-                        "plot.color": "#2962ff",
-                        "plot.linewidth": 2
+                    } catch (e) {
+
+                        console.log("AutoScale Error:", e);
                     }
-                );
 
-                console.log("✅ EMA Study Added");
-
-            } catch (e) {
-
-                console.log(
-                    "❌ EMA Study Error:",
-                    e
-                );
-            }
-
-            // =================================================
-            // INTERVAL CHANGE
-            // =================================================
-
-            chart.onIntervalChanged().subscribe(
-
-                null,
-
-                () => {
-
-                    console.log(
-                        "⏱ Timeframe Changed"
-                    );
-
-                    setTimeout(() => {
-
-                        try {
-
-                            chart.resetData();
-
-                        } catch (e) {
-
-                            console.log(
-                                "Reset Error:",
-                                e
-                            );
-                        }
-
-                    }, 100);
-                }
-            );
+                }, 100);
+            });
 
             // =================================================
             // SYMBOL CHANGE
             // =================================================
 
-            chart.onSymbolChanged().subscribe(
+            chart.onSymbolChanged().subscribe(null, (symbolInfo) => {
 
-                null,
-
-                (symbolInfo) => {
-
-                    console.log(
-                        "📈 Symbol Changed:",
-                        symbolInfo
-                    );
-                }
-            );
+                console.log("📈 Symbol Changed:", symbolInfo);
+            });
 
             // =================================================
-            // AUTO FIT
+            // AUTO FIT CONTENT
             // =================================================
 
             setTimeout(() => {
 
                 try {
 
-                    chart.resetData();
+                    chart.executeActionById("chartAutoScale");
 
                 } catch (e) {
 
@@ -342,82 +213,6 @@
                 }
 
             }, 1000);
-
-        });
-
-        // =====================================================
-        // SOCKET CONNECT
-        // =====================================================
-
-        socket.on("connect", () => {
-
-            console.log(
-                "✅ Socket Connected"
-            );
-        });
-
-        // =====================================================
-        // SOCKET DISCONNECT
-        // =====================================================
-
-        socket.on("disconnect", () => {
-
-            console.log(
-                "❌ Socket Disconnected"
-            );
-        });
-
-        // =====================================================
-        // REALTIME TICK EMA
-        // =====================================================
-
-        socket.on("tick_ema", (data) => {
-
-            try {
-
-                console.log(
-                    "🔥 Tick EMA:",
-                    data
-                );
-
-                const ema = data.ema;
-
-                // =============================================
-                // UPDATE EMA BOX
-                // =============================================
-
-                const el =
-                    document.getElementById(
-                        "ema_value"
-                    );
-
-                if (el) {
-
-                    el.innerHTML =
-                        "EMA 20 : " + ema;
-                }
-
-            } catch (e) {
-
-                console.log(
-                    "EMA SOCKET ERROR:",
-                    e
-                );
-            }
-
-        });
-
-        // =====================================================
-        // REALTIME CANDLE
-        // =====================================================
-
-        socket.on("candle", (data) => {
-
-            console.log(
-                "🕯 Candle:",
-                data
-            );
-
         });
 
     </script>
