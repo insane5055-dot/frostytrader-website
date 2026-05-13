@@ -60,7 +60,7 @@
             width: 100%;
             height: 100%;
 
-            z-index: 10;
+            z-index: 9999;
 
             pointer-events: none;
         }
@@ -87,18 +87,21 @@
         // SOCKET.IO
         // =====================================================
 
-        const socket = io("http://localhost:5000");
+        const socket = io({
+
+            transports: ["websocket", "polling"]
+        });
 
         // =====================================================
         // EMA STORAGE
         // =====================================================
 
-        const emaPoints = [];
+        const emaData = [];
 
-        const pricePoints = [];
+        const priceData = [];
 
         // =====================================================
-        // CREATE WIDGET
+        // CREATE TRADINGVIEW
         // =====================================================
 
         window.tvWidget = new TradingView.widget({
@@ -166,7 +169,7 @@
                 "symbolWatermarkProperties.transparency": 0,
 
                 // =================================================
-                // CANDLE
+                // CANDLE STYLE
                 // =================================================
 
                 "mainSeriesProperties.candleStyle.upColor": "#26a69a",
@@ -234,28 +237,53 @@
             );
 
             // =================================================
-            // SOCKET EMA
+            // SOCKET CONNECT
+            // =================================================
+
+            socket.on("connect", () => {
+
+                console.log("🟢 WebSocket Connected");
+            });
+
+            socket.on("disconnect", () => {
+
+                console.log("🔴 WebSocket Disconnected");
+            });
+
+            // =================================================
+            // RECEIVE EMA
             // =================================================
 
             socket.on("tick_ema", (data) => {
 
                 // =============================================
-                // STORE EMA
+                // DEBUG
                 // =============================================
 
-                emaPoints.push(data.ema);
-
-                pricePoints.push(data.price);
+                console.log("EMA:", data);
 
                 // =============================================
-                // LIMIT MEMORY
+                // STORE DATA
                 // =============================================
 
-                if (emaPoints.length > 500) {
+                emaData.push({
 
-                    emaPoints.shift();
+                    time: data.time,
 
-                    pricePoints.shift();
+                    value: data.ema
+                });
+
+                priceData.push(data.price);
+
+                // =============================================
+                // LIMIT
+                // =============================================
+
+                if (emaData.length > 1000) {
+
+                    emaData.shift();
+
+                    priceData.shift();
                 }
 
                 // =============================================
@@ -272,36 +300,31 @@
             function drawEMA() {
 
                 ctx.clearRect(
+
                     0,
                     0,
                     canvas.width,
                     canvas.height
                 );
 
-                if (emaPoints.length < 2)
+                if (emaData.length < 2)
                     return;
 
                 // =============================================
                 // PRICE RANGE
                 // =============================================
 
-                const maxPrice = Math.max(
-                    ...pricePoints
-                );
+                const maxPrice = Math.max(...priceData);
 
-                const minPrice = Math.min(
-                    ...pricePoints
-                );
+                const minPrice = Math.min(...priceData);
 
-                const range = (
-                    maxPrice - minPrice
-                );
+                const range = maxPrice - minPrice;
 
                 if (range <= 0)
                     return;
 
                 // =============================================
-                // LINE STYLE
+                // STYLE
                 // =============================================
 
                 ctx.beginPath();
@@ -311,14 +334,14 @@
                 ctx.strokeStyle = "#2962ff";
 
                 // =============================================
-                // DRAW
+                // DRAW LINE
                 // =============================================
 
-                emaPoints.forEach((ema, index) => {
+                emaData.forEach((point, index) => {
 
                     const x = (
 
-                        index / (emaPoints.length - 1)
+                        index / (emaData.length - 1)
 
                     ) * canvas.width;
 
@@ -328,7 +351,7 @@
 
                         (
                             (
-                                ema - minPrice
+                                point.value - minPrice
                             ) / range
                         ) * canvas.height
 
@@ -348,44 +371,6 @@
             }
 
             // =================================================
-            // INTERVAL CHANGE
-            // =================================================
-
-            chart.onIntervalChanged().subscribe(
-
-                null,
-
-                () => {
-
-                    console.log(
-                        "⏱ Timeframe Changed"
-                    );
-
-                    setTimeout(() => {
-
-                        try {
-
-                            chart.executeActionById(
-                                "chartAutoScale"
-                            );
-
-                            chart.executeActionById(
-                                "chartReset"
-                            );
-
-                        } catch (e) {
-
-                            console.log(
-                                "AutoScale Error:",
-                                e
-                            );
-                        }
-
-                    }, 100);
-                }
-            );
-
-            // =================================================
             // SYMBOL CHANGE
             // =================================================
 
@@ -400,15 +385,12 @@
                         symbolInfo
                     );
 
-                    // =========================================
-                    // RESET EMA
-                    // =========================================
+                    emaData.length = 0;
 
-                    emaPoints.length = 0;
-
-                    pricePoints.length = 0;
+                    priceData.length = 0;
 
                     ctx.clearRect(
+
                         0,
                         0,
                         canvas.width,
@@ -416,25 +398,6 @@
                     );
                 }
             );
-
-            // =================================================
-            // AUTO SCALE
-            // =================================================
-
-            setTimeout(() => {
-
-                try {
-
-                    chart.executeActionById(
-                        "chartAutoScale"
-                    );
-
-                } catch (e) {
-
-                    console.log(e);
-                }
-
-            }, 1000);
 
         });
 
