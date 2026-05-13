@@ -43,7 +43,7 @@
         }
 
         /* ================================================= */
-        /* TICK EMA BOX */
+        /* LIVE EMA BOX */
         /* ================================================= */
 
         #tick-ema-box {
@@ -200,13 +200,7 @@
         // =====================================================
 
         const socket = io(
-            "https://frosty-backend.onrender.com",
-            {
-
-                transports: ["websocket"],
-
-                upgrade: false
-            }
+            "https://frosty-backend.onrender.com"
         );
 
         // =====================================================
