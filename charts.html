@@ -51,9 +51,9 @@
 
             font-weight: bold;
 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-
             color: #2962ff;
+
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
         }
 
     </style>
@@ -62,7 +62,7 @@
 
 <body>
 
-    <!-- EMA VALUE -->
+    <!-- EMA BOX -->
     <div id="ema_value">
 
         EMA 20 : Loading...
@@ -80,9 +80,11 @@
         // SOCKET.IO
         // =====================================================
 
-        const socket = io("http://localhost:5000", {
+        const socket = io("https://frostytrader.in", {
 
             transports: ["websocket"],
+
+            secure: true,
 
             reconnection: true,
 
@@ -98,7 +100,7 @@
         let emaStudy = null;
 
         // =====================================================
-        // CREATE WIDGET
+        // CREATE TRADINGVIEW WIDGET
         // =====================================================
 
         window.tvWidget = new TradingView.widget({
@@ -276,7 +278,7 @@
             }
 
             // =================================================
-            // TIMEFRAME CHANGE FIX
+            // INTERVAL CHANGE
             // =================================================
 
             chart.onIntervalChanged().subscribe(
@@ -293,18 +295,12 @@
 
                         try {
 
-                            chart.executeActionById(
-                                "chartAutoScale"
-                            );
-
-                            chart.executeActionById(
-                                "chartReset"
-                            );
+                            chart.resetData();
 
                         } catch (e) {
 
                             console.log(
-                                "AutoScale Error:",
+                                "Reset Error:",
                                 e
                             );
                         }
@@ -331,16 +327,14 @@
             );
 
             // =================================================
-            // AUTO FIT CONTENT
+            // AUTO FIT
             // =================================================
 
             setTimeout(() => {
 
                 try {
 
-                    chart.executeActionById(
-                        "chartAutoScale"
-                    );
+                    chart.resetData();
 
                 } catch (e) {
 
@@ -374,7 +368,7 @@
         });
 
         // =====================================================
-        // REALTIME EMA
+        // REALTIME TICK EMA
         // =====================================================
 
         socket.on("tick_ema", (data) => {
