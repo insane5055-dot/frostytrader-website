@@ -11,7 +11,7 @@ let lastSearchId = 0;
 // =========================================================
 
 const BASE_URL =
-     "https://frosty-backend-4mox.onrender.com";
+    "https://YOUR-RENDER-URL.onrender.com";
 
 // =========================================================
 // SOCKET
@@ -41,17 +41,21 @@ const Datafeed = {
 
         console.log("✅ Datafeed Ready");
 
-        cb({
+        setTimeout(() => {
 
-            supported_resolutions: [
+            cb({
 
-                "1",
+                supported_resolutions: [
 
-                "5",
+                    "1",
 
-                "15"
-            ]
-        });
+                    "5",
+
+                    "15"
+                ]
+            });
+
+        }, 0);
     },
 
     // =====================================================
@@ -359,7 +363,14 @@ const Datafeed = {
 
         socket = io(BASE_URL, {
 
-            transports: ["websocket"],
+            transports: [
+
+                "polling",
+
+                "websocket"
+            ],
+
+            upgrade: true,
 
             reconnection: true,
 
@@ -406,6 +417,18 @@ const Datafeed = {
             console.log(
                 "⚠️ WS Error:",
                 err.message
+            );
+        });
+
+        // =================================================
+        // RECONNECT
+        // =================================================
+
+        socket.on("reconnect", (attempt) => {
+
+            console.log(
+                "🔄 Reconnected:",
+                attempt
             );
         });
 
@@ -467,7 +490,7 @@ const Datafeed = {
                 lastBar = bar;
 
                 // =============================================
-                // SEND TO TV
+                // SEND TO TRADINGVIEW
                 // =============================================
 
                 currentCallback(bar);
