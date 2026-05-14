@@ -11,7 +11,7 @@ let lastSearchId = 0;
 // =========================================================
 
 const BASE_URL =
-    "https://frosty-backend-4mox.onrender.com";
+    "https://YOUR-RENDER-URL.onrender.com";
 
 // =========================================================
 // SOCKET
@@ -26,6 +26,12 @@ let currentCallback = null;
 // =========================================================
 
 let lastBar = null;
+
+// =========================================================
+// CURRENT SYMBOL
+// =========================================================
+
+let currentSymbolInfo = null;
 
 // =========================================================
 // DATAFEED
@@ -158,6 +164,8 @@ const Datafeed = {
 
                 return;
             }
+
+            currentSymbolInfo = data;
 
             onResolve({
 
@@ -394,6 +402,27 @@ const Datafeed = {
             console.log(
                 "✅ WebSocket Connected"
             );
+
+            // =============================================
+            // SEND ACTIVE SYMBOL
+            // =============================================
+
+            socket.emit("change_symbol", {
+
+                security_id:
+                    symbolInfo.security_id,
+
+                exchange_segment:
+                    symbolInfo.exchange_segment,
+
+                symbol:
+                    symbolInfo.name
+            });
+
+            console.log(
+                "✅ Symbol Sent:",
+                symbolInfo.name
+            );
         });
 
         // =================================================
@@ -430,6 +459,22 @@ const Datafeed = {
                 "🔄 Reconnected:",
                 attempt
             );
+
+            // =============================================
+            // RESEND SYMBOL AFTER RECONNECT
+            // =============================================
+
+            socket.emit("change_symbol", {
+
+                security_id:
+                    symbolInfo.security_id,
+
+                exchange_segment:
+                    symbolInfo.exchange_segment,
+
+                symbol:
+                    symbolInfo.name
+            });
         });
 
         // =================================================
@@ -441,6 +486,20 @@ const Datafeed = {
             try {
 
                 if (!currentCallback) {
+
+                    return;
+                }
+
+                // =============================================
+                // FILTER OTHER SYMBOLS
+                // =============================================
+
+                if (
+
+                    data.symbol !==
+                    symbolInfo.name
+
+                ) {
 
                     return;
                 }
