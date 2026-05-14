@@ -83,23 +83,47 @@
             debug: false,
 
             // =================================================
+            // PERFORMANCE
+            // =================================================
+
+            load_last_chart: false,
+
+            // =================================================
             // FEATURES
             // =================================================
 
             enabled_features: [
 
                 "study_templates"
+
             ],
 
             disabled_features: [
 
+                // =================================================
+                // STORAGE
+                // =================================================
+
                 "use_localstorage_for_settings",
 
-                "volume_force_overlay",
+                // =================================================
+                // TOOLBARS
+                // =================================================
+
+                "left_toolbar",
 
                 "header_compare",
 
-                "header_symbol_search_hot_key"
+                "header_symbol_search_hot_key",
+
+                "timeframes_toolbar",
+
+                // =================================================
+                // VOLUME
+                // =================================================
+
+                "volume_force_overlay"
+
             ],
 
             // =================================================
@@ -215,33 +239,12 @@
 
                     console.log("⏱ Interval Changed:", interval);
 
-                    try {
-
-                        chart.resetData();
-
-                    } catch (e) {
-
-                        console.log("Reset Error:", e);
-                    }
+                    // NO resetData()
+                    // TradingView handles this internally
                 }
             );
 
-            // =================================================
-            // AUTO REFRESH
-            // =================================================
-
-            setTimeout(() => {
-
-                try {
-
-                    chart.resetData();
-
-                } catch (e) {
-
-                    console.log(e);
-                }
-
-            }, 1000);
+            console.log("⚡ Ultra Fast Mode Enabled");
         });
 
     </script>
