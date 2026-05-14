@@ -5,15 +5,18 @@
 
     <meta charset="UTF-8" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    />
 
-    <title>Frosty Trader Chart</title>
+    <title>Frosty Trader Pro</title>
 
     <!-- ================================================= -->
     <!-- TRADINGVIEW LIBRARY -->
     <!-- ================================================= -->
 
-    <script src="charting_library/charting_library.js"></script>
+    <script src="./charting_library/charting_library.js"></script>
 
     <!-- ================================================= -->
     <!-- SOCKET.IO -->
@@ -36,6 +39,49 @@
             overflow: hidden;
 
             background: #ffffff;
+
+            font-family: Arial, sans-serif;
+        }
+
+        .topbar {
+
+            position: absolute;
+
+            top: 10px;
+            left: 10px;
+
+            z-index: 9999;
+
+            display: flex;
+
+            gap: 10px;
+
+            background: rgba(255,255,255,0.95);
+
+            padding: 8px 12px;
+
+            border-radius: 10px;
+
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .indicator-box {
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            color: #000;
+        }
+
+        .ema20 {
+
+            color: #2962ff;
+        }
+
+        .ema50 {
+
+            color: #ff6d00;
         }
 
     </style>
@@ -43,6 +89,32 @@
 </head>
 
 <body>
+
+    <!-- ================================================= -->
+    <!-- EMA DISPLAY -->
+    <!-- ================================================= -->
+
+    <div class="topbar">
+
+        <div
+            class="indicator-box ema20"
+            id="ema20"
+        >
+            EMA20: --
+        </div>
+
+        <div
+            class="indicator-box ema50"
+            id="ema50"
+        >
+            EMA50: --
+        </div>
+
+    </div>
+
+    <!-- ================================================= -->
+    <!-- CHART -->
+    <!-- ================================================= -->
 
     <div id="tvchart"></div>
 
@@ -190,6 +262,29 @@
             const chart = widget.chart();
 
             // =================================================
+            // LIVE EMA UPDATE
+            // =================================================
+
+            window.updateEMAValues = (ema20, ema50) => {
+
+                if (ema20 !== undefined) {
+
+                    document.getElementById(
+                        "ema20"
+                    ).innerHTML =
+                        `EMA20: ${ema20}`;
+                }
+
+                if (ema50 !== undefined) {
+
+                    document.getElementById(
+                        "ema50"
+                    ).innerHTML =
+                        `EMA50: ${ema50}`;
+                }
+            };
+
+            // =================================================
             // SYMBOL CHANGE
             // =================================================
 
@@ -199,7 +294,18 @@
 
                 (symbolInfo) => {
 
-                    console.log("📈 Symbol Changed:", symbolInfo);
+                    console.log(
+                        "📈 Symbol Changed:",
+                        symbolInfo
+                    );
+
+                    document.getElementById(
+                        "ema20"
+                    ).innerHTML = "EMA20: --";
+
+                    document.getElementById(
+                        "ema50"
+                    ).innerHTML = "EMA50: --";
                 }
             );
 
@@ -213,7 +319,10 @@
 
                 (interval) => {
 
-                    console.log("⏱ Interval Changed:", interval);
+                    console.log(
+                        "⏱ Interval Changed:",
+                        interval
+                    );
 
                     try {
 
@@ -221,7 +330,10 @@
 
                     } catch (e) {
 
-                        console.log("Reset Error:", e);
+                        console.log(
+                            "Reset Error:",
+                            e
+                        );
                     }
                 }
             );
