@@ -11,7 +11,7 @@ let lastSearchId = 0;
 // =========================================================
 
 const BASE_URL =
-    "https://YOUR-RENDER-URL.onrender.com";
+    "https://frosty-backend-4mox.onrender.com";
 
 // =========================================================
 // SOCKET
