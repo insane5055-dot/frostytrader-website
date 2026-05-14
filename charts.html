@@ -82,8 +82,6 @@
 
             debug: false,
 
-            load_last_chart: false,
-
             // =================================================
             // FEATURES
             // =================================================
@@ -91,7 +89,6 @@
             enabled_features: [
 
                 "study_templates"
-
             ],
 
             disabled_features: [
@@ -102,12 +99,7 @@
 
                 "header_compare",
 
-                "header_symbol_search_hot_key",
-
-                "left_toolbar",
-
-                "timeframes_toolbar"
-
+                "header_symbol_search_hot_key"
             ],
 
             // =================================================
@@ -159,17 +151,17 @@
                 // CANDLE COLORS
                 // =============================================
 
-                "mainSeriesProperties.candleStyle.upColor": "#9bbb59",
+                "mainSeriesProperties.candleStyle.upColor": "#26a69a",
 
                 "mainSeriesProperties.candleStyle.downColor": "#ef5350",
 
-                "mainSeriesProperties.candleStyle.borderUpColor": "#9bbb59",
+                "mainSeriesProperties.candleStyle.borderUpColor": "#26a69a",
 
                 "mainSeriesProperties.candleStyle.borderDownColor": "#ef5350",
 
-                "mainSeriesProperties.candleStyle.wickUpColor": "#000000",
+                "mainSeriesProperties.candleStyle.wickUpColor": "#26a69a",
 
-                "mainSeriesProperties.candleStyle.wickDownColor": "#000000",
+                "mainSeriesProperties.candleStyle.wickDownColor": "#ef5350",
 
                 // =============================================
                 // PRICE LINE
@@ -198,178 +190,6 @@
             const chart = widget.chart();
 
             // =================================================
-            // FORMAT VOLUME
-            // =================================================
-
-            function formatVolume(v) {
-
-                if (!v) return "";
-
-                if (v >= 1000000) {
-
-                    return (v / 1000000).toFixed(1) + "M";
-                }
-
-                if (v >= 1000) {
-
-                    return Math.round(v / 1000) + "K";
-                }
-
-                return String(v);
-            }
-
-            // =================================================
-            // DRAW VOLUME LABELS
-            // =================================================
-
-            async function drawVolumeLabels() {
-
-                try {
-
-                    // remove old labels
-                    chart.removeAllShapes();
-
-                    // =========================================
-                    // GET VISIBLE RANGE
-                    // =========================================
-
-                    const visibleRange =
-                        chart.getVisibleRange();
-
-                    if (!visibleRange) {
-                        return;
-                    }
-
-                    // =========================================
-                    // GET BARS FROM DATAFEED
-                    // =========================================
-
-                    const symbol =
-                        chart.symbol();
-
-                    const interval =
-                        chart.resolution();
-
-                    const from =
-                        visibleRange.from;
-
-                    const to =
-                        visibleRange.to;
-
-                    // =========================================
-                    // RESOLVE SYMBOL
-                    // =========================================
-
-                    const resolveRes = await fetch(
-
-                        `https://frosty-backend-4mox.onrender.com/resolve?symbol=${encodeURIComponent(symbol)}`
-                    );
-
-                    const resolveData =
-                        await resolveRes.json();
-
-                    // =========================================
-                    // HISTORY
-                    // =========================================
-
-                    const historyUrl =
-
-                        `https://frosty-backend-4mox.onrender.com/history` +
-
-                        `?security_id=${resolveData.security_id}` +
-
-                        `&exchange=${resolveData.exchange_segment}` +
-
-                        `&instrument=${resolveData.instrument}` +
-
-                        `&resolution=${interval}` +
-
-                        `&from=${Math.floor(from)}` +
-
-                        `&to=${Math.floor(to)}`;
-
-                    const historyRes =
-                        await fetch(historyUrl);
-
-                    const data =
-                        await historyRes.json();
-
-                    if (data.s !== "ok") {
-                        return;
-                    }
-
-                    // =========================================
-                    // CREATE LABELS
-                    // =========================================
-
-                    for (let i = 0; i < data.t.length; i++) {
-
-                        const volume = data.v[i];
-
-                        const low = data.l[i];
-
-                        const time = data.t[i];
-
-                        if (!volume) {
-                            continue;
-                        }
-
-                        chart.createMultipointShape(
-
-                            [
-                                {
-                                    time: time,
-
-                                    price: low
-                                }
-                            ],
-
-                            {
-                                shape: "text",
-
-                                text: formatVolume(volume),
-
-                                lock: true,
-
-                                disableSelection: true,
-
-                                disableSave: true,
-
-                                disableUndo: true,
-
-                                overrides: {
-
-                                    color: "#000000",
-
-                                    fontsize: 10,
-
-                                    bold: true,
-
-                                    backgroundColor: "transparent"
-                                }
-                            }
-                        );
-                    }
-
-                    console.log("✅ Volume labels drawn");
-
-                } catch (e) {
-
-                    console.log("❌ Volume Label Error:", e);
-                }
-            }
-
-            // =================================================
-            // INITIAL DRAW
-            // =================================================
-
-            setTimeout(() => {
-
-                drawVolumeLabels();
-
-            }, 3000);
-
-            // =================================================
             // SYMBOL CHANGE
             // =================================================
 
@@ -377,13 +197,9 @@
 
                 null,
 
-                () => {
+                (symbolInfo) => {
 
-                    setTimeout(() => {
-
-                        drawVolumeLabels();
-
-                    }, 2000);
+                    console.log("📈 Symbol Changed:", symbolInfo);
                 }
             );
 
@@ -395,17 +211,37 @@
 
                 null,
 
-                () => {
+                (interval) => {
 
-                    setTimeout(() => {
+                    console.log("⏱ Interval Changed:", interval);
 
-                        drawVolumeLabels();
+                    try {
 
-                    }, 2000);
+                        chart.resetData();
+
+                    } catch (e) {
+
+                        console.log("Reset Error:", e);
+                    }
                 }
             );
 
-            console.log("⚡ Ultra Fast Mode Enabled");
+            // =================================================
+            // AUTO REFRESH
+            // =================================================
+
+            setTimeout(() => {
+
+                try {
+
+                    chart.resetData();
+
+                } catch (e) {
+
+                    console.log(e);
+                }
+
+            }, 1000);
         });
 
     </script>
