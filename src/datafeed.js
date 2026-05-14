@@ -3,20 +3,29 @@
 // =========================================================
 
 let searchTimeout = null;
+
 let lastSearchId = 0;
 
 // =========================================================
 // BACKEND URL
 // =========================================================
 
-const BASE_URL = "https://frosty-backend-4mox.onrender.com";
+const BASE_URL =
+     "https://frosty-backend-4mox.onrender.com";
 
 // =========================================================
 // SOCKET
 // =========================================================
 
 let socket = null;
+
 let currentCallback = null;
+
+// =========================================================
+// LAST BAR CACHE
+// =========================================================
+
+let lastBar = null;
 
 // =========================================================
 // DATAFEED
@@ -33,7 +42,15 @@ const Datafeed = {
         console.log("✅ Datafeed Ready");
 
         cb({
-            supported_resolutions: ["1", "5", "15"]
+
+            supported_resolutions: [
+
+                "1",
+
+                "5",
+
+                "15"
+            ]
         });
     },
 
@@ -42,10 +59,15 @@ const Datafeed = {
     // =====================================================
 
     searchSymbols: (
+
         userInput,
+
         exchange,
+
         symbolType,
+
         onResultReadyCallback
+
     ) => {
 
         clearTimeout(searchTimeout);
@@ -56,25 +78,36 @@ const Datafeed = {
 
             try {
 
-                console.log("🔍 Searching:", userInput);
+                console.log(
+                    "🔍 Searching:",
+                    userInput
+                );
 
                 const res = await fetch(
+
                     `${BASE_URL}/search?q=${encodeURIComponent(userInput)}`
                 );
 
                 const data = await res.json();
 
                 if (searchId !== lastSearchId) {
+
                     return;
                 }
 
-                console.log("✅ Search Results:", data);
+                console.log(
+                    "✅ Search Results:",
+                    data
+                );
 
                 onResultReadyCallback(data);
 
             } catch (err) {
 
-                console.error("❌ Search error:", err);
+                console.error(
+                    "❌ Search error:",
+                    err
+                );
 
                 onResultReadyCallback([]);
             }
@@ -87,22 +120,33 @@ const Datafeed = {
     // =====================================================
 
     resolveSymbol: async (
+
         symbolName,
+
         onResolve,
+
         onError
+
     ) => {
 
         try {
 
-            console.log("📌 Resolving:", symbolName);
+            console.log(
+                "📌 Resolving:",
+                symbolName
+            );
 
             const res = await fetch(
+
                 `${BASE_URL}/resolve?symbol=${encodeURIComponent(symbolName)}`
             );
 
             const data = await res.json();
 
-            console.log("✅ Resolve Data:", data);
+            console.log(
+                "✅ Resolve Data:",
+                data
+            );
 
             if (data.error) {
 
@@ -137,7 +181,8 @@ const Datafeed = {
 
                 has_weekly_and_monthly: true,
 
-                supported_resolutions: data.supported_resolutions,
+                supported_resolutions:
+                    data.supported_resolutions,
 
                 volume_precision: 2,
 
@@ -147,53 +192,76 @@ const Datafeed = {
 
                 instrument: data.instrument,
 
-                exchange_segment: data.exchange_segment
+                exchange_segment:
+                    data.exchange_segment
             });
 
         } catch (err) {
 
-            console.error("❌ Resolve error:", err);
+            console.error(
+                "❌ Resolve error:",
+                err
+            );
 
             onError("Resolve error");
         }
     },
 
     // =====================================================
-    // HISTORY
+    // GET HISTORY
     // =====================================================
 
     getBars: async (
+
         symbolInfo,
+
         resolution,
+
         periodParams,
+
         onHistoryCallback,
+
         onErrorCallback
+
     ) => {
 
         try {
 
-            console.log("📚 Loading history...");
+            console.log(
+                "📚 Loading history..."
+            );
 
             const { from, to } = periodParams;
 
             const url =
+
                 `${BASE_URL}/history` +
+
                 `?security_id=${symbolInfo.security_id}` +
+
                 `&exchange=${symbolInfo.exchange_segment}` +
+
                 `&instrument=${symbolInfo.instrument}` +
+
                 `&resolution=${resolution}` +
+
                 `&from=${from}` +
+
                 `&to=${to}`;
 
             const res = await fetch(url);
 
             const data = await res.json();
 
-            console.log("📦 History Response:", data);
+            console.log(
+                "📦 History Response:",
+                data
+            );
 
             if (data.s !== "ok") {
 
                 onHistoryCallback([], {
+
                     noData: true
                 });
 
@@ -215,15 +283,32 @@ const Datafeed = {
                 volume: data.v[i]
             }));
 
-            console.log("✅ Bars Loaded:", bars.length);
+            // =================================================
+            // SAVE LAST BAR
+            // =================================================
+
+            if (bars.length > 0) {
+
+                lastBar =
+                    bars[bars.length - 1];
+            }
+
+            console.log(
+                "✅ Bars Loaded:",
+                bars.length
+            );
 
             onHistoryCallback(bars, {
+
                 noData: false
             });
 
         } catch (err) {
 
-            console.error("❌ History error:", err);
+            console.error(
+                "❌ History error:",
+                err
+            );
 
             onErrorCallback(err);
         }
@@ -234,27 +319,34 @@ const Datafeed = {
     // =====================================================
 
     subscribeBars: (
+
         symbolInfo,
+
         resolution,
+
         onRealtimeCallback,
+
         subscriberUID
+
     ) => {
 
-        console.log("📡 subscribeBars:", symbolInfo.name);
+        console.log(
+            "📡 subscribeBars:",
+            symbolInfo.name
+        );
 
-        // update callback
-        currentCallback = onRealtimeCallback;
+        currentCallback =
+            onRealtimeCallback;
 
-        // reuse existing socket
-        if (socket && socket.connected) {
+        // =================================================
+        // CLEAN OLD SOCKET
+        // =================================================
 
-            console.log("♻️ Reusing existing socket");
-
-            return;
-        }
-
-        // cleanup old socket
         if (socket) {
+
+            console.log(
+                "♻️ Closing old socket"
+            );
 
             socket.disconnect();
 
@@ -271,13 +363,15 @@ const Datafeed = {
 
             reconnection: true,
 
-            reconnectionAttempts: 5,
+            reconnectionAttempts: Infinity,
 
-            reconnectionDelay: 3000,
+            reconnectionDelay: 2000,
+
+            reconnectionDelayMax: 5000,
 
             timeout: 20000,
 
-            forceNew: false
+            forceNew: true
         });
 
         // =================================================
@@ -286,7 +380,9 @@ const Datafeed = {
 
         socket.on("connect", () => {
 
-            console.log("✅ WebSocket Connected");
+            console.log(
+                "✅ WebSocket Connected"
+            );
         });
 
         // =================================================
@@ -295,44 +391,94 @@ const Datafeed = {
 
         socket.on("disconnect", (reason) => {
 
-            console.log("❌ Socket Disconnected:", reason);
+            console.log(
+                "❌ Socket Disconnected:",
+                reason
+            );
         });
 
         // =================================================
-        // ERROR
+        // CONNECT ERROR
         // =================================================
 
         socket.on("connect_error", (err) => {
 
-            console.log("⚠️ WS Error:", err.message);
+            console.log(
+                "⚠️ WS Error:",
+                err.message
+            );
         });
 
         // =================================================
-        // LIVE CANDLE
+        // MARKET DATA
         // =================================================
 
-        socket.on("candle", (candle) => {
+        socket.on("market_data", (data) => {
 
-            // console.log("📊 Live Candle:", candle);
+            try {
 
-            if (!currentCallback) {
-                return;
+                if (!currentCallback) {
+
+                    return;
+                }
+
+                // =============================================
+                // UPDATE EMA VALUES
+                // =============================================
+
+                if (
+
+                    window.updateEMAValues
+
+                ) {
+
+                    window.updateEMAValues(
+
+                        data.ema20,
+
+                        data.ema50
+                    );
+                }
+
+                // =============================================
+                // REALTIME BAR
+                // =============================================
+
+                const bar = {
+
+                    time:
+                        data.minute * 60 * 1000,
+
+                    open: data.open,
+
+                    high: data.high,
+
+                    low: data.low,
+
+                    close: data.close,
+
+                    volume: data.volume
+                };
+
+                // =============================================
+                // SAVE LAST BAR
+                // =============================================
+
+                lastBar = bar;
+
+                // =============================================
+                // SEND TO TV
+                // =============================================
+
+                currentCallback(bar);
+
+            } catch (e) {
+
+                console.log(
+                    "❌ MARKET DATA ERROR:",
+                    e
+                );
             }
-
-            currentCallback({
-
-                time: candle.minute * 60 * 1000,
-
-                open: candle.open,
-
-                high: candle.high,
-
-                low: candle.low,
-
-                close: candle.close,
-
-                volume: candle.volume
-            });
         });
     },
 
@@ -340,11 +486,24 @@ const Datafeed = {
     // UNSUBSCRIBE
     // =====================================================
 
-    unsubscribeBars: () => {
+    unsubscribeBars: (
 
-        console.log("🛑 unsubscribeBars");
+        subscriberUID
+
+    ) => {
+
+        console.log(
+            "🛑 unsubscribeBars"
+        );
 
         currentCallback = null;
+
+        if (socket) {
+
+            socket.disconnect();
+
+            socket = null;
+        }
     }
 };
 
