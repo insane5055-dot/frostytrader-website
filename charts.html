@@ -78,7 +78,7 @@
 
             position: absolute;
 
-            top: 60px;
+            top: 70px;
             right: 20px;
 
             width: 420px;
@@ -382,11 +382,11 @@
         import Datafeed from "./src/datafeed.js";
 
         // =================================================
-        // SOCKET
+        // SOCKET.IO
         // =================================================
 
         const socket = io(
-            "http://localhost:5000"
+            "https://frosty-backend.onrender.com"
         );
 
         // =================================================
@@ -418,10 +418,7 @@
 
             debug: false,
 
-            enabled_features: [
-
-                "study_templates"
-            ],
+            enabled_features: [],
 
             disabled_features: [
 
@@ -509,13 +506,6 @@
                     "#2962ff",
 
                 "mainSeriesProperties.showPriceLine":
-                    true,
-
-                // =====================================
-                // LAST VALUE
-                // =====================================
-
-                "mainSeriesProperties.showSeriesLastValue":
                     true
             }
         });
@@ -533,10 +523,6 @@
             const chart =
                 widget.chart();
 
-            // =============================================
-            // SYMBOL CHANGE
-            // =============================================
-
             chart.onSymbolChanged().subscribe(
 
                 null,
@@ -549,10 +535,6 @@
                     );
                 }
             );
-
-            // =============================================
-            // INTERVAL CHANGE
-            // =============================================
 
             chart.onIntervalChanged().subscribe(
 
@@ -575,10 +557,6 @@
                     }
                 }
             );
-
-            // =============================================
-            // AUTO REFRESH
-            // =============================================
 
             setTimeout(() => {
 
