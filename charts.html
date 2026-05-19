@@ -49,21 +49,21 @@
 
             position: absolute;
 
-            top: 10px;
+            top: 12px;
             right: 20px;
 
             z-index: 99999;
 
             background: white;
 
-            padding: 10px 20px;
+            padding: 10px 24px;
 
-            border-radius: 12px;
+            border-radius: 14px;
 
             box-shadow:
-                0 0 15px rgba(0,0,0,0.15);
+                0 0 18px rgba(0,0,0,0.15);
 
-            font-size: 24px;
+            font-size: 28px;
 
             font-weight: bold;
 
@@ -78,14 +78,14 @@
 
             position: absolute;
 
-            top: 70px;
+            top: 80px;
             right: 20px;
 
-            width: 420px;
+            width: 430px;
 
             background: white;
 
-            border-radius: 16px;
+            border-radius: 18px;
 
             box-shadow:
                 0 0 25px rgba(0,0,0,0.18);
@@ -98,7 +98,7 @@
         }
 
         /* ================================================= */
-        /* HEADER */
+        /* DOM HEADER */
         /* ================================================= */
 
         .dom-header {
@@ -112,15 +112,13 @@
 
             color: white;
 
-            padding: 14px;
+            padding: 16px;
 
-            font-size: 20px;
+            font-size: 24px;
 
             font-weight: bold;
 
             text-align: center;
-
-            letter-spacing: 1px;
         }
 
         /* ================================================= */
@@ -139,9 +137,9 @@
 
             border-bottom: 1px solid #eee;
 
-            font-weight: bold;
+            font-size: 20px;
 
-            font-size: 18px;
+            font-weight: bold;
         }
 
         .bid-label {
@@ -155,14 +153,12 @@
         }
 
         /* ================================================= */
-        /* DOM COLUMNS */
+        /* DOM BODY */
         /* ================================================= */
 
         .dom-columns {
 
             display: flex;
-
-            justify-content: space-between;
         }
 
         .dom-side {
@@ -178,7 +174,7 @@
         }
 
         /* ================================================= */
-        /* TITLES */
+        /* COLUMN TITLES */
         /* ================================================= */
 
         .dom-title {
@@ -212,7 +208,7 @@
         }
 
         /* ================================================= */
-        /* ROWS */
+        /* DOM ROWS */
         /* ================================================= */
 
         .dom-row {
@@ -228,7 +224,7 @@
 
             font-size: 13px;
 
-            border-bottom: 1px solid #f2f2f2;
+            border-bottom: 1px solid #f1f1f1;
 
             transition: 0.15s;
         }
@@ -324,13 +320,13 @@
         </div>
 
         <!-- ============================================= -->
-        <!-- DOM -->
+        <!-- DOM TABLE -->
         <!-- ============================================= -->
 
         <div class="dom-columns">
 
             <!-- ========================================= -->
-            <!-- BID -->
+            <!-- BID SIDE -->
             <!-- ========================================= -->
 
             <div class="dom-side bid-side">
@@ -350,7 +346,7 @@
             </div>
 
             <!-- ========================================= -->
-            <!-- ASK -->
+            <!-- ASK SIDE -->
             <!-- ========================================= -->
 
             <div class="dom-side">
@@ -374,7 +370,7 @@
     </div>
 
     <!-- ================================================= -->
-    <!-- SCRIPT -->
+    <!-- MAIN SCRIPT -->
     <!-- ================================================= -->
 
     <script type="module">
@@ -386,8 +382,31 @@
         // =================================================
 
         const socket = io(
-            "https://frosty-backend.onrender.com"
+
+            "https://frosty-backend.onrender.com",
+
+            {
+                transports: ["websocket"]
+            }
         );
+
+        // =================================================
+        // SOCKET STATUS
+        // =================================================
+
+        socket.on("connect", () => {
+
+            console.log(
+                "✅ WebSocket Connected"
+            );
+        });
+
+        socket.on("disconnect", () => {
+
+            console.log(
+                "❌ WebSocket Disconnected"
+            );
+        });
 
         // =================================================
         // TRADINGVIEW WIDGET
@@ -557,19 +576,6 @@
                     }
                 }
             );
-
-            setTimeout(() => {
-
-                try {
-
-                    chart.resetData();
-
-                } catch (e) {
-
-                    console.log(e);
-                }
-
-            }, 1000);
         });
 
         // =================================================
@@ -578,10 +584,17 @@
 
         socket.on("ltp", (data) => {
 
+            console.log(
+                "LTP:",
+                data
+            );
+
             document.getElementById(
                 "live-price"
             ).innerHTML =
-                data.price.toFixed(2);
+                Number(
+                    data.price
+                ).toFixed(2);
         });
 
         // =================================================
@@ -589,6 +602,11 @@
         // =================================================
 
         socket.on("dom", (data) => {
+
+            console.log(
+                "DOM:",
+                data
+            );
 
             const bidList =
                 document.getElementById(
@@ -658,24 +676,6 @@
                     </div>
                 `;
             });
-        });
-
-        // =================================================
-        // SOCKET STATUS
-        // =================================================
-
-        socket.on("connect", () => {
-
-            console.log(
-                "✅ Socket Connected"
-            );
-        });
-
-        socket.on("disconnect", () => {
-
-            console.log(
-                "❌ Socket Disconnected"
-            );
         });
 
     </script>
