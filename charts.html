@@ -56,14 +56,14 @@
 
             background: white;
 
-            padding: 12px 24px;
+            padding: 12px 26px;
 
-            border-radius: 14px;
+            border-radius: 16px;
 
             box-shadow:
-                0 0 18px rgba(0,0,0,0.15);
+                0 0 20px rgba(0,0,0,0.15);
 
-            font-size: 30px;
+            font-size: 34px;
 
             font-weight: bold;
 
@@ -78,10 +78,10 @@
 
             position: absolute;
 
-            top: 80px;
+            top: 90px;
             right: 20px;
 
-            width: 430px;
+            width: 440px;
 
             background: white;
 
@@ -114,11 +114,13 @@
 
             padding: 16px;
 
-            font-size: 24px;
+            font-size: 26px;
 
             font-weight: bold;
 
             text-align: center;
+
+            letter-spacing: 1px;
         }
 
         /* ================================================= */
@@ -131,13 +133,13 @@
 
             justify-content: space-between;
 
-            background: #fafafa;
+            padding: 14px 20px;
 
-            padding: 12px 20px;
+            background: #fafafa;
 
             border-bottom: 1px solid #eee;
 
-            font-size: 20px;
+            font-size: 22px;
 
             font-weight: bold;
         }
@@ -153,7 +155,7 @@
         }
 
         /* ================================================= */
-        /* DOM BODY */
+        /* BODY */
         /* ================================================= */
 
         .dom-columns {
@@ -164,8 +166,6 @@
         .dom-side {
 
             width: 50%;
-
-            overflow: hidden;
         }
 
         .bid-side {
@@ -174,7 +174,7 @@
         }
 
         /* ================================================= */
-        /* TITLES */
+        /* TITLE */
         /* ================================================= */
 
         .dom-title {
@@ -183,8 +183,6 @@
 
             grid-template-columns:
                 90px 70px 70px;
-
-            align-items: center;
 
             padding: 10px;
 
@@ -208,7 +206,7 @@
         }
 
         /* ================================================= */
-        /* ROWS */
+        /* ROW */
         /* ================================================= */
 
         .dom-row {
@@ -220,7 +218,7 @@
 
             align-items: center;
 
-            padding: 8px 10px;
+            padding: 9px 10px;
 
             font-size: 13px;
 
@@ -320,7 +318,7 @@
         </div>
 
         <!-- ============================================= -->
-        <!-- DOM TABLE -->
+        <!-- TABLE -->
         <!-- ============================================= -->
 
         <div class="dom-columns">
@@ -370,7 +368,7 @@
     </div>
 
     <!-- ================================================= -->
-    <!-- MAIN SCRIPT -->
+    <!-- SCRIPT -->
     <!-- ================================================= -->
 
     <script type="module">
@@ -383,13 +381,15 @@
 
         const socket = io(
 
-            "https://frosty-backend.onrender.com",
+            "https://frosty-backend-4mox.onrender.com",
 
             {
 
                 transports: ["websocket"],
 
                 upgrade: false,
+
+                secure: true,
 
                 reconnection: true,
 
@@ -436,7 +436,7 @@
         });
 
         // =================================================
-        // TRADINGVIEW WIDGET
+        // TRADINGVIEW
         // =================================================
 
         const widget = new TradingView.widget({
@@ -488,10 +488,6 @@
 
             overrides: {
 
-                // =====================================
-                // BACKGROUND
-                // =====================================
-
                 "paneProperties.background":
                     "#ffffff",
 
@@ -501,30 +497,14 @@
                 "paneProperties.horzGridProperties.color":
                     "#f0f3fa",
 
-                // =====================================
-                // TEXT
-                // =====================================
-
                 "scalesProperties.textColor":
                     "#000000",
-
-                // =====================================
-                // CROSSHAIR
-                // =====================================
 
                 "paneProperties.crossHairProperties.color":
                     "#758696",
 
-                // =====================================
-                // WATERMARK
-                // =====================================
-
                 "symbolWatermarkProperties.transparency":
                     90,
-
-                // =====================================
-                // CANDLE COLORS
-                // =====================================
 
                 "mainSeriesProperties.candleStyle.upColor":
                     "#26a69a",
@@ -543,10 +523,6 @@
 
                 "mainSeriesProperties.candleStyle.wickDownColor":
                     "#ef5350",
-
-                // =====================================
-                // PRICE LINE
-                // =====================================
 
                 "mainSeriesProperties.priceLineColor":
                     "#2962ff",
@@ -625,7 +601,7 @@
         });
 
         // =================================================
-        // DOM UPDATE
+        // DOM
         // =================================================
 
         socket.on("dom", (data) => {
@@ -649,7 +625,7 @@
             askList.innerHTML = "";
 
             // =============================================
-            // BIDS
+            // BID
             // =============================================
 
             data.bids.forEach((b) => {
@@ -677,7 +653,7 @@
             });
 
             // =============================================
-            // ASKS
+            // ASK
             // =============================================
 
             data.asks.forEach((a) => {
