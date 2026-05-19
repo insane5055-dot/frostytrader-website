@@ -42,6 +42,35 @@
         }
 
         /* ================================================= */
+        /* LIVE PRICE */
+        /* ================================================= */
+
+        #live-price {
+
+            position: absolute;
+
+            top: 10px;
+            right: 20px;
+
+            z-index: 99999;
+
+            background: white;
+
+            padding: 10px 20px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 0 15px rgba(0,0,0,0.15);
+
+            font-size: 24px;
+
+            font-weight: bold;
+
+            color: #2962ff;
+        }
+
+        /* ================================================= */
         /* FLOATING DOM */
         /* ================================================= */
 
@@ -49,34 +78,43 @@
 
             position: absolute;
 
-            top: 70px;
+            top: 60px;
             right: 20px;
 
-            width: 320px;
+            width: 420px;
 
             background: white;
 
-            border-radius: 14px;
+            border-radius: 16px;
 
             box-shadow:
-                0 0 25px rgba(0,0,0,0.15);
+                0 0 25px rgba(0,0,0,0.18);
 
             z-index: 99999;
 
             overflow: hidden;
 
-            border: 1px solid #e0e0e0;
+            border: 1px solid #e5e5e5;
         }
+
+        /* ================================================= */
+        /* HEADER */
+        /* ================================================= */
 
         .dom-header {
 
-            background: #2962ff;
+            background:
+                linear-gradient(
+                    90deg,
+                    #2962ff,
+                    #1e4bd8
+                );
 
             color: white;
 
-            padding: 12px;
+            padding: 14px;
 
-            font-size: 16px;
+            font-size: 20px;
 
             font-weight: bold;
 
@@ -85,52 +123,80 @@
             letter-spacing: 1px;
         }
 
+        /* ================================================= */
+        /* TOP LABELS */
+        /* ================================================= */
+
         .dom-top {
 
             display: flex;
 
             justify-content: space-between;
 
-            padding: 10px 15px;
+            background: #fafafa;
 
-            background: #f8f9fa;
+            padding: 12px 20px;
 
-            font-size: 13px;
+            border-bottom: 1px solid #eee;
 
             font-weight: bold;
 
-            border-bottom: 1px solid #eee;
+            font-size: 18px;
         }
+
+        .bid-label {
+
+            color: #00897b;
+        }
+
+        .ask-label {
+
+            color: #ef5350;
+        }
+
+        /* ================================================= */
+        /* DOM COLUMNS */
+        /* ================================================= */
 
         .dom-columns {
 
             display: flex;
+
+            justify-content: space-between;
         }
 
         .dom-side {
 
             width: 50%;
+
+            overflow: hidden;
         }
 
-        .dom-side.bid-side {
+        .bid-side {
 
             border-right: 1px solid #eee;
         }
+
+        /* ================================================= */
+        /* TITLES */
+        /* ================================================= */
 
         .dom-title {
 
             display: grid;
 
             grid-template-columns:
-                70px 60px 60px;
+                90px 70px 70px;
 
-            padding: 8px;
+            align-items: center;
 
-            font-size: 12px;
+            padding: 10px;
+
+            font-size: 13px;
 
             font-weight: bold;
 
-            background: #fafafa;
+            background: #f9f9f9;
 
             border-bottom: 1px solid #eee;
         }
@@ -145,20 +211,24 @@
             color: #ef5350;
         }
 
+        /* ================================================= */
+        /* ROWS */
+        /* ================================================= */
+
         .dom-row {
 
             display: grid;
 
             grid-template-columns:
-                70px 60px 60px;
+                90px 70px 70px;
 
             align-items: center;
 
-            padding: 7px 8px;
+            padding: 8px 10px;
 
             font-size: 13px;
 
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f2f2f2;
 
             transition: 0.15s;
         }
@@ -199,35 +269,6 @@
             text-align: right;
         }
 
-        /* ================================================= */
-        /* LIVE PRICE */
-        /* ================================================= */
-
-        #live-price {
-
-            position: absolute;
-
-            top: 15px;
-            right: 20px;
-
-            z-index: 99999;
-
-            background: white;
-
-            padding: 10px 20px;
-
-            border-radius: 10px;
-
-            box-shadow:
-                0 0 15px rgba(0,0,0,0.12);
-
-            font-size: 22px;
-
-            font-weight: bold;
-
-            color: #2962ff;
-        }
-
     </style>
 
 </head>
@@ -256,19 +297,35 @@
 
     <div id="dom-box">
 
+        <!-- ============================================= -->
+        <!-- HEADER -->
+        <!-- ============================================= -->
+
         <div class="dom-header">
 
             LIVE DOM
 
         </div>
 
+        <!-- ============================================= -->
+        <!-- TOP -->
+        <!-- ============================================= -->
+
         <div class="dom-top">
 
-            <span>BID</span>
+            <span class="bid-label">
+                BID
+            </span>
 
-            <span>ASK</span>
+            <span class="ask-label">
+                ASK
+            </span>
 
         </div>
+
+        <!-- ============================================= -->
+        <!-- DOM -->
+        <!-- ============================================= -->
 
         <div class="dom-columns">
 
@@ -317,7 +374,7 @@
     </div>
 
     <!-- ================================================= -->
-    <!-- MAIN SCRIPT -->
+    <!-- SCRIPT -->
     <!-- ================================================= -->
 
     <script type="module">
@@ -325,7 +382,7 @@
         import Datafeed from "./src/datafeed.js";
 
         // =================================================
-        // SOCKET.IO
+        // SOCKET
         // =================================================
 
         const socket = io(
@@ -626,7 +683,7 @@
         });
 
         // =================================================
-        // SOCKET CONNECT
+        // SOCKET STATUS
         // =================================================
 
         socket.on("connect", () => {
