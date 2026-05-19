@@ -49,7 +49,7 @@
 
             position: absolute;
 
-            top: 12px;
+            top: 10px;
             right: 20px;
 
             z-index: 99999;
@@ -98,7 +98,7 @@
         }
 
         /* ================================================= */
-        /* DOM HEADER */
+        /* HEADER */
         /* ================================================= */
 
         .dom-header {
@@ -326,7 +326,7 @@
         <div class="dom-columns">
 
             <!-- ========================================= -->
-            <!-- BID SIDE -->
+            <!-- BID -->
             <!-- ========================================= -->
 
             <div class="dom-side bid-side">
@@ -346,7 +346,7 @@
             </div>
 
             <!-- ========================================= -->
-            <!-- ASK SIDE -->
+            <!-- ASK -->
             <!-- ========================================= -->
 
             <div class="dom-side">
@@ -386,12 +386,23 @@
             "https://frosty-backend.onrender.com",
 
             {
-                transports: ["websocket"]
+
+                transports: ["websocket"],
+
+                upgrade: false,
+
+                reconnection: true,
+
+                reconnectionAttempts: Infinity,
+
+                reconnectionDelay: 1000,
+
+                timeout: 20000
             }
         );
 
         // =================================================
-        // SOCKET STATUS
+        // SOCKET CONNECT
         // =================================================
 
         socket.on("connect", () => {
@@ -401,10 +412,26 @@
             );
         });
 
+        // =================================================
+        // SOCKET DISCONNECT
+        // =================================================
+
         socket.on("disconnect", () => {
 
             console.log(
                 "❌ WebSocket Disconnected"
+            );
+        });
+
+        // =================================================
+        // SOCKET ERROR
+        // =================================================
+
+        socket.on("connect_error", (err) => {
+
+            console.log(
+                "❌ Socket Error:",
+                err
             );
         });
 
@@ -585,7 +612,7 @@
         socket.on("ltp", (data) => {
 
             console.log(
-                "LTP:",
+                "📈 LTP:",
                 data
             );
 
@@ -604,7 +631,7 @@
         socket.on("dom", (data) => {
 
             console.log(
-                "DOM:",
+                "📘 DOM:",
                 data
             );
 
