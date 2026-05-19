@@ -7,10 +7,10 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Frosty Trader Advanced DOM</title>
+    <title>Frosty Trader Chart</title>
 
     <!-- ================================================= -->
-    <!-- TRADINGVIEW -->
+    <!-- TRADINGVIEW LIBRARY -->
     <!-- ================================================= -->
 
     <script src="charting_library/charting_library.js"></script>
@@ -24,7 +24,8 @@
     <style>
 
         html,
-        body {
+        body,
+        #tvchart {
 
             margin: 0;
             padding: 0;
@@ -34,180 +35,7 @@
 
             overflow: hidden;
 
-            background: #0d1117;
-
-            font-family: Arial, sans-serif;
-        }
-
-        #layout {
-
-            width: 100%;
-            height: 100%;
-
-            display: flex;
-        }
-
-        /* ================================================= */
-        /* CHART */
-        /* ================================================= */
-
-        #tvchart {
-
-            flex: 1;
-
-            height: 100%;
-        }
-
-        /* ================================================= */
-        /* DOM PANEL */
-        /* ================================================= */
-
-        #domPanel {
-
-            width: 340px;
-
-            background: #111827;
-
-            color: white;
-
-            border-left: 2px solid #1f2937;
-
-            display: flex;
-
-            flex-direction: column;
-        }
-
-        .domHeader {
-
-            padding: 14px;
-
-            font-size: 18px;
-
-            font-weight: bold;
-
-            text-align: center;
-
-            background: #1f2937;
-
-            border-bottom: 1px solid #374151;
-        }
-
-        .domTitles {
-
-            display: grid;
-
-            grid-template-columns: 1fr 1fr 1fr;
-
-            padding: 10px;
-
-            font-size: 13px;
-
-            font-weight: bold;
-
-            background: #111827;
-
-            border-bottom: 1px solid #374151;
-
-            text-align: center;
-        }
-
-        #domRows {
-
-            flex: 1;
-
-            overflow-y: auto;
-
-            padding: 5px;
-        }
-
-        .domRow {
-
-            display: grid;
-
-            grid-template-columns: 1fr 1fr 1fr;
-
-            gap: 5px;
-
-            margin-bottom: 6px;
-        }
-
-        .bidBox {
-
-            background: rgba(0, 255, 0, 0.15);
-
-            border: 1px solid rgba(0,255,0,0.25);
-
-            padding: 6px;
-
-            border-radius: 6px;
-
-            text-align: center;
-        }
-
-        .askBox {
-
-            background: rgba(255, 0, 0, 0.15);
-
-            border: 1px solid rgba(255,0,0,0.25);
-
-            padding: 6px;
-
-            border-radius: 6px;
-
-            text-align: center;
-        }
-
-        .priceBox {
-
-            background: #1f2937;
-
-            border: 1px solid #374151;
-
-            padding: 6px;
-
-            border-radius: 6px;
-
-            text-align: center;
-
-            font-weight: bold;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-        }
-
-        .bigOrder {
-
-            border: 2px solid yellow;
-
-            box-shadow: 0 0 10px yellow;
-        }
-
-        .qtyText {
-
-            font-size: 14px;
-
-            font-weight: bold;
-        }
-
-        .orderText {
-
-            font-size: 11px;
-
-            margin-top: 2px;
-
-            opacity: 0.8;
-        }
-
-        .timeText {
-
-            font-size: 10px;
-
-            margin-top: 3px;
-
-            opacity: 0.6;
+            background: #ffffff;
         }
 
     </style>
@@ -216,61 +44,21 @@
 
 <body>
 
-    <!-- ================================================= -->
-    <!-- LAYOUT -->
-    <!-- ================================================= -->
-
-    <div id="layout">
-
-        <!-- ============================================= -->
-        <!-- TRADINGVIEW -->
-        <!-- ============================================= -->
-
-        <div id="tvchart"></div>
-
-        <!-- ============================================= -->
-        <!-- DOM -->
-        <!-- ============================================= -->
-
-        <div id="domPanel">
-
-            <div class="domHeader">
-
-                ADVANCE DOM
-
-            </div>
-
-            <div class="domTitles">
-
-                <div>BID</div>
-
-                <div>PRICE</div>
-
-                <div>ASK</div>
-
-            </div>
-
-            <div id="domRows"></div>
-
-        </div>
-
-    </div>
+    <div id="tvchart"></div>
 
     <script type="module">
 
         import Datafeed from "./src/datafeed.js";
 
         // =====================================================
-        // SOCKET.IO
-        // =====================================================
-
-        const socket = io("http://localhost:5000");
-
-        // =====================================================
-        // TRADINGVIEW WIDGET
+        // CREATE WIDGET
         // =====================================================
 
         const widget = new TradingView.widget({
+
+            // =================================================
+            // BASIC
+            // =================================================
 
             container: "tvchart",
 
@@ -286,13 +74,17 @@
 
             fullscreen: false,
 
-            theme: "dark",
+            theme: "light",
 
             symbol: "NSE:NIFTY 50",
 
             interval: "1",
 
             debug: false,
+
+            // =================================================
+            // FEATURES
+            // =================================================
 
             enabled_features: [
 
@@ -310,12 +102,20 @@
                 "header_symbol_search_hot_key"
             ],
 
+            // =================================================
+            // LOADING SCREEN
+            // =================================================
+
             loading_screen: {
 
-                backgroundColor: "#0d1117",
+                backgroundColor: "#ffffff",
 
                 foregroundColor: "#2962ff"
             },
+
+            // =================================================
+            // OVERRIDES
+            // =================================================
 
             overrides: {
 
@@ -323,20 +123,32 @@
                 // BACKGROUND
                 // =============================================
 
-                "paneProperties.background": "#0d1117",
+                "paneProperties.background": "#ffffff",
 
-                "paneProperties.vertGridProperties.color": "#1f2937",
+                "paneProperties.vertGridProperties.color": "#f0f3fa",
 
-                "paneProperties.horzGridProperties.color": "#1f2937",
+                "paneProperties.horzGridProperties.color": "#f0f3fa",
 
                 // =============================================
                 // TEXT
                 // =============================================
 
-                "scalesProperties.textColor": "#d1d4dc",
+                "scalesProperties.textColor": "#000000",
 
                 // =============================================
-                // CANDLES
+                // CROSSHAIR
+                // =============================================
+
+                "paneProperties.crossHairProperties.color": "#758696",
+
+                // =============================================
+                // WATERMARK
+                // =============================================
+
+                "symbolWatermarkProperties.transparency": 90,
+
+                // =============================================
+                // CANDLE COLORS
                 // =============================================
 
                 "mainSeriesProperties.candleStyle.upColor": "#26a69a",
@@ -359,97 +171,11 @@
 
                 "mainSeriesProperties.showPriceLine": true,
 
+                // =============================================
+                // LAST VALUE
+                // =============================================
+
                 "mainSeriesProperties.showSeriesLastValue": true
-            }
-        });
-
-        // =====================================================
-        // DOM UPDATE
-        // =====================================================
-
-        socket.on("dom_update", (data) => {
-
-            const rows = document.getElementById("domRows");
-
-            rows.innerHTML = "";
-
-            if (!data.bids || !data.asks) return;
-
-            const maxBid = Math.max(
-                ...data.bids.map(x => x.qty)
-            );
-
-            const maxAsk = Math.max(
-                ...data.asks.map(x => x.qty)
-            );
-
-            for (let i = 0; i < 5; i++) {
-
-                const bid = data.bids[i];
-
-                const ask = data.asks[i];
-
-                if (!bid || !ask) continue;
-
-                const row = document.createElement("div");
-
-                row.className = "domRow";
-
-                row.innerHTML = `
-
-                    <div class="bidBox ${bid.qty === maxBid ? 'bigOrder' : ''}">
-
-                        <div class="qtyText">
-
-                            ${bid.qty}
-
-                        </div>
-
-                        <div class="orderText">
-
-                            ${bid.orders} ORD
-
-                        </div>
-
-                        <div class="timeText">
-
-                            ${bid.time}
-
-                        </div>
-
-                    </div>
-
-                    <div class="priceBox">
-
-                        ${bid.price}
-
-                    </div>
-
-                    <div class="askBox ${ask.qty === maxAsk ? 'bigOrder' : ''}">
-
-                        <div class="qtyText">
-
-                            ${ask.qty}
-
-                        </div>
-
-                        <div class="orderText">
-
-                            ${ask.orders} ORD
-
-                        </div>
-
-                        <div class="timeText">
-
-                            ${ask.time}
-
-                        </div>
-
-                    </div>
-
-                `;
-
-                rows.appendChild(row);
             }
         });
 
@@ -495,13 +221,13 @@
 
                     } catch (e) {
 
-                        console.log(e);
+                        console.log("Reset Error:", e);
                     }
                 }
             );
 
             // =================================================
-            // INITIAL REFRESH
+            // AUTO REFRESH
             // =================================================
 
             setTimeout(() => {
