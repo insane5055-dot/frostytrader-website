@@ -5,21 +5,18 @@
 
     <meta charset="UTF-8" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    />
 
     <title>Frosty Trader Chart</title>
 
-    <!-- ================================================= -->
+    <!-- ============================================= -->
     <!-- TRADINGVIEW LIBRARY -->
-    <!-- ================================================= -->
+    <!-- ============================================= -->
 
     <script src="charting_library/charting_library.js"></script>
-
-    <!-- ================================================= -->
-    <!-- SOCKET.IO -->
-    <!-- ================================================= -->
-
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
     <style>
 
@@ -44,9 +41,9 @@
 
 <body>
 
-    <!-- ================================================= -->
+    <!-- ============================================= -->
     <!-- CHART -->
-    <!-- ================================================= -->
+    <!-- ============================================= -->
 
     <div id="tvchart"></div>
 
@@ -54,15 +51,15 @@
 
         import Datafeed from "./src/datafeed.js";
 
-        // =====================================================
+        // =============================================
         // CREATE WIDGET
-        // =====================================================
+        // =============================================
 
         const widget = new TradingView.widget({
 
-            // =================================================
+            // =========================================
             // BASIC
-            // =================================================
+            // =========================================
 
             container: "tvchart",
 
@@ -86,9 +83,9 @@
 
             debug: false,
 
-            // =================================================
+            // =========================================
             // FEATURES
-            // =================================================
+            // =========================================
 
             enabled_features: [
 
@@ -108,9 +105,9 @@
                 "header_screenshot"
             ],
 
-            // =================================================
+            // =========================================
             // LOADING SCREEN
-            // =================================================
+            // =========================================
 
             loading_screen: {
 
@@ -119,177 +116,96 @@
                 foregroundColor: "#2962ff"
             },
 
-            // =================================================
+            // =========================================
             // OVERRIDES
-            // =================================================
+            // =========================================
 
             overrides: {
 
-                // =============================================
+                // =====================================
                 // BACKGROUND
-                // =============================================
+                // =====================================
 
-                "paneProperties.background": "#ffffff",
+                "paneProperties.background":
+                "#ffffff",
 
-                "paneProperties.vertGridProperties.color": "#f0f3fa",
+                "paneProperties.vertGridProperties.color":
+                "#f0f3fa",
 
-                "paneProperties.horzGridProperties.color": "#f0f3fa",
+                "paneProperties.horzGridProperties.color":
+                "#f0f3fa",
 
-                // =============================================
+                // =====================================
                 // TEXT
-                // =============================================
+                // =====================================
 
-                "scalesProperties.textColor": "#000000",
+                "scalesProperties.textColor":
+                "#000000",
 
-                // =============================================
+                // =====================================
                 // CROSSHAIR
-                // =============================================
+                // =====================================
 
-                "paneProperties.crossHairProperties.color": "#758696",
+                "paneProperties.crossHairProperties.color":
+                "#758696",
 
-                // =============================================
+                // =====================================
                 // WATERMARK
-                // =============================================
+                // =====================================
 
-                "symbolWatermarkProperties.transparency": 90,
+                "symbolWatermarkProperties.transparency":
+                90,
 
-                // =============================================
+                // =====================================
                 // CANDLE COLORS
-                // =============================================
+                // =====================================
 
-                "mainSeriesProperties.candleStyle.upColor": "#26a69a",
+                "mainSeriesProperties.candleStyle.upColor":
+                "#26a69a",
 
-                "mainSeriesProperties.candleStyle.downColor": "#ef5350",
+                "mainSeriesProperties.candleStyle.downColor":
+                "#ef5350",
 
-                "mainSeriesProperties.candleStyle.borderUpColor": "#26a69a",
+                "mainSeriesProperties.candleStyle.borderUpColor":
+                "#26a69a",
 
-                "mainSeriesProperties.candleStyle.borderDownColor": "#ef5350",
+                "mainSeriesProperties.candleStyle.borderDownColor":
+                "#ef5350",
 
-                "mainSeriesProperties.candleStyle.wickUpColor": "#26a69a",
+                "mainSeriesProperties.candleStyle.wickUpColor":
+                "#26a69a",
 
-                "mainSeriesProperties.candleStyle.wickDownColor": "#ef5350",
+                "mainSeriesProperties.candleStyle.wickDownColor":
+                "#ef5350",
 
-                // =============================================
+                // =====================================
                 // PRICE LINE
-                // =============================================
+                // =====================================
 
-                "mainSeriesProperties.priceLineColor": "#2962ff",
+                "mainSeriesProperties.priceLineColor":
+                "#2962ff",
 
-                "mainSeriesProperties.showPriceLine": true,
+                "mainSeriesProperties.showPriceLine":
+                true,
 
-                // =============================================
+                // =====================================
                 // LAST VALUE
-                // =============================================
+                // =====================================
 
-                "mainSeriesProperties.showSeriesLastValue": true
+                "mainSeriesProperties.showSeriesLastValue":
+                true
             }
         });
 
-        // =====================================================
+        // =============================================
         // CHART READY
-        // =====================================================
+        // =============================================
 
         widget.onChartReady(() => {
 
-            console.log("✅ TradingView Ready");
-
-            const chart = widget.chart();
-
-            // =================================================
-            // SYMBOL CHANGE
-            // =================================================
-
-            chart.onSymbolChanged().subscribe(
-
-                null,
-
-                (symbolInfo) => {
-
-                    console.log(
-                        "📈 Symbol Changed:",
-                        symbolInfo
-                    );
-
-                    try {
-
-                        chart.resetData();
-
-                    } catch (e) {
-
-                        console.log(
-                            "Reset Error:",
-                            e
-                        );
-                    }
-                }
+            console.log(
+                "✅ TradingView Ready"
             );
-
-            // =================================================
-            // INTERVAL CHANGE
-            // =================================================
-
-            chart.onIntervalChanged().subscribe(
-
-                null,
-
-                (interval) => {
-
-                    console.log(
-                        "⏱ Interval Changed:",
-                        interval
-                    );
-
-                    try {
-
-                        chart.resetData();
-
-                    } catch (e) {
-
-                        console.log(
-                            "Reset Error:",
-                            e
-                        );
-                    }
-                }
-            );
-
-            // =================================================
-            // AUTO REFRESH
-            // =================================================
-
-            setTimeout(() => {
-
-                try {
-
-                    chart.resetData();
-
-                } catch (e) {
-
-                    console.log(e);
-                }
-
-            }, 1000);
-
-            // =================================================
-            // SOCKET CONNECTION TEST
-            // =================================================
-
-            const socket =
-                io("https://frosty-backend-4mox.onrender.com");
-
-            socket.on("connect", () => {
-
-                console.log(
-                    "✅ Socket Connected"
-                );
-            });
-
-            socket.on("disconnect", () => {
-
-                console.log(
-                    "❌ Socket Disconnected"
-                );
-            });
 
         });
 
