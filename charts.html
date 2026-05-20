@@ -5,15 +5,18 @@
 
     <meta charset="UTF-8" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    />
 
-    <title>Frosty Trader Chart</title>
+    <title>Frosty Trader</title>
 
     <!-- ================================================= -->
-    <!-- TRADINGVIEW LIBRARY -->
+    <!-- TRADINGVIEW -->
     <!-- ================================================= -->
 
-    <script src="charting_library/charting_library.js"></script>
+    <script src="./charting_library/charting_library.js"></script>
 
     <!-- ================================================= -->
     <!-- SOCKET.IO -->
@@ -57,7 +60,7 @@
         const widget = new TradingView.widget({
 
             // =================================================
-            // BASIC
+            // CONTAINER
             // =================================================
 
             container: "tvchart",
@@ -76,11 +79,15 @@
 
             theme: "light",
 
-            symbol: "NSE:NIFTY 50",
+            // =================================================
+            // DEFAULT SYMBOL
+            // =================================================
+
+            symbol: "IDX_I:Nifty 50",
 
             interval: "1",
 
-            debug: false,
+            debug: true,
 
             // =================================================
             // FEATURES
@@ -95,11 +102,11 @@
 
                 "use_localstorage_for_settings",
 
-                "volume_force_overlay",
-
                 "header_compare",
 
-                "header_symbol_search_hot_key"
+                "header_symbol_search_hot_key",
+
+                "timeframes_toolbar"
             ],
 
             // =================================================
@@ -123,64 +130,69 @@
                 // BACKGROUND
                 // =============================================
 
-                "paneProperties.background": "#ffffff",
+                "paneProperties.background":
+                "#ffffff",
 
-                "paneProperties.vertGridProperties.color": "#f0f3fa",
+                "paneProperties.vertGridProperties.color":
+                "#f0f3fa",
 
-                "paneProperties.horzGridProperties.color": "#f0f3fa",
+                "paneProperties.horzGridProperties.color":
+                "#f0f3fa",
 
                 // =============================================
                 // TEXT
                 // =============================================
 
-                "scalesProperties.textColor": "#000000",
+                "scalesProperties.textColor":
+                "#000000",
 
                 // =============================================
                 // CROSSHAIR
                 // =============================================
 
-                "paneProperties.crossHairProperties.color": "#758696",
+                "paneProperties.crossHairProperties.color":
+                "#758696",
 
                 // =============================================
                 // WATERMARK
                 // =============================================
 
-                "symbolWatermarkProperties.transparency": 90,
+                "symbolWatermarkProperties.transparency":
+                90,
 
                 // =============================================
                 // CANDLE COLORS
                 // =============================================
 
-                "mainSeriesProperties.candleStyle.upColor": "#26a69a",
+                "mainSeriesProperties.candleStyle.upColor":
+                "#26a69a",
 
-                "mainSeriesProperties.candleStyle.downColor": "#ef5350",
+                "mainSeriesProperties.candleStyle.downColor":
+                "#ef5350",
 
-                "mainSeriesProperties.candleStyle.borderUpColor": "#26a69a",
+                "mainSeriesProperties.candleStyle.borderUpColor":
+                "#26a69a",
 
-                "mainSeriesProperties.candleStyle.borderDownColor": "#ef5350",
+                "mainSeriesProperties.candleStyle.borderDownColor":
+                "#ef5350",
 
-                "mainSeriesProperties.candleStyle.wickUpColor": "#26a69a",
+                "mainSeriesProperties.candleStyle.wickUpColor":
+                "#26a69a",
 
-                "mainSeriesProperties.candleStyle.wickDownColor": "#ef5350",
+                "mainSeriesProperties.candleStyle.wickDownColor":
+                "#ef5350",
 
                 // =============================================
                 // PRICE LINE
                 // =============================================
 
-                "mainSeriesProperties.priceLineColor": "#2962ff",
-
-                "mainSeriesProperties.showPriceLine": true,
-
-                // =============================================
-                // LAST VALUE
-                // =============================================
-
-                "mainSeriesProperties.showSeriesLastValue": true
+                "mainSeriesProperties.priceLineColor":
+                "#2962ff"
             }
         });
 
         // =====================================================
-        // CHART READY
+        // READY
         // =====================================================
 
         widget.onChartReady(() => {
@@ -190,7 +202,7 @@
             const chart = widget.chart();
 
             // =================================================
-            // SYMBOL CHANGE
+            // SYMBOL CHANGED
             // =================================================
 
             chart.onSymbolChanged().subscribe(
@@ -199,12 +211,15 @@
 
                 (symbolInfo) => {
 
-                    console.log("📈 Symbol Changed:", symbolInfo);
+                    console.log(
+                        "📈 Symbol Changed:",
+                        symbolInfo
+                    );
                 }
             );
 
             // =================================================
-            // INTERVAL CHANGE
+            // INTERVAL CHANGED
             // =================================================
 
             chart.onIntervalChanged().subscribe(
@@ -213,35 +228,40 @@
 
                 (interval) => {
 
-                    console.log("⏱ Interval Changed:", interval);
-
-                    try {
-
-                        chart.resetData();
-
-                    } catch (e) {
-
-                        console.log("Reset Error:", e);
-                    }
+                    console.log(
+                        "⏱ Interval Changed:",
+                        interval
+                    );
                 }
             );
 
             // =================================================
-            // AUTO REFRESH
+            // DATA LOADED
+            // =================================================
+
+            chart.dataReady(() => {
+
+                console.log("✅ Chart Data Loaded");
+            });
+
+            // =================================================
+            // FORCE REFRESH
             // =================================================
 
             setTimeout(() => {
 
                 try {
 
-                    chart.resetData();
+                    widget.activeChart().resetData();
+
+                    console.log("🔄 Chart Refreshed");
 
                 } catch (e) {
 
                     console.log(e);
                 }
 
-            }, 1000);
+            }, 2000);
         });
 
     </script>
