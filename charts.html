@@ -10,13 +10,16 @@
         content="width=device-width, initial-scale=1.0"
     />
 
-    <title>Frosty Trader Pro</title>
+    <title>Frosty Trader</title>
 
     <!-- ================================================= -->
     <!-- TRADINGVIEW LIBRARY -->
     <!-- ================================================= -->
 
-    <script src="./charting_library/charting_library.js"></script>
+    <script
+        type="text/javascript"
+        src="./charting_library/charting_library.js">
+    </script>
 
     <!-- ================================================= -->
     <!-- SOCKET.IO -->
@@ -27,8 +30,7 @@
     <style>
 
         html,
-        body,
-        #tvchart {
+        body {
 
             margin: 0;
             padding: 0;
@@ -43,45 +45,10 @@
             font-family: Arial, sans-serif;
         }
 
-        .topbar {
+        #tvchart {
 
-            position: absolute;
-
-            top: 10px;
-            left: 10px;
-
-            z-index: 9999;
-
-            display: flex;
-
-            gap: 10px;
-
-            background: rgba(255,255,255,0.95);
-
-            padding: 8px 12px;
-
-            border-radius: 10px;
-
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .indicator-box {
-
-            font-size: 14px;
-
-            font-weight: bold;
-
-            color: #000;
-        }
-
-        .ema20 {
-
-            color: #2962ff;
-        }
-
-        .ema50 {
-
-            color: #ff6d00;
+            width: 100%;
+            height: 100vh;
         }
 
     </style>
@@ -91,270 +58,300 @@
 <body>
 
     <!-- ================================================= -->
-    <!-- EMA DISPLAY -->
-    <!-- ================================================= -->
-
-    <div class="topbar">
-
-        <div
-            class="indicator-box ema20"
-            id="ema20"
-        >
-            EMA20: --
-        </div>
-
-        <div
-            class="indicator-box ema50"
-            id="ema50"
-        >
-            EMA50: --
-        </div>
-
-    </div>
-
-    <!-- ================================================= -->
     <!-- CHART -->
     <!-- ================================================= -->
 
     <div id="tvchart"></div>
 
+    <!-- ================================================= -->
+    <!-- DATAFEED -->
+    <!-- ================================================= -->
+
     <script type="module">
 
         import Datafeed from "./src/datafeed.js";
 
-        // =====================================================
-        // CREATE WIDGET
-        // =====================================================
+        // =================================================
+        // WAIT FOR TV LIBRARY
+        // =================================================
 
-        const widget = new TradingView.widget({
+        function startChart() {
 
-            // =================================================
-            // BASIC
-            // =================================================
+            if (
+                typeof TradingView === "undefined"
+            ) {
 
-            container: "tvchart",
+                console.log(
+                    "⌛ Waiting for TradingView..."
+                );
 
-            library_path: "./charting_library/",
+                setTimeout(
+                    startChart,
+                    500
+                );
 
-            datafeed: Datafeed,
-
-            locale: "en",
-
-            timezone: "Asia/Kolkata",
-
-            autosize: true,
-
-            fullscreen: false,
-
-            theme: "light",
-
-            symbol: "NSE:NIFTY 50",
-
-            interval: "1",
-
-            debug: false,
-
-            // =================================================
-            // FEATURES
-            // =================================================
-
-            enabled_features: [
-
-                "study_templates"
-            ],
-
-            disabled_features: [
-
-                "use_localstorage_for_settings",
-
-                "volume_force_overlay",
-
-                "header_compare",
-
-                "header_symbol_search_hot_key"
-            ],
-
-            // =================================================
-            // LOADING SCREEN
-            // =================================================
-
-            loading_screen: {
-
-                backgroundColor: "#ffffff",
-
-                foregroundColor: "#2962ff"
-            },
-
-            // =================================================
-            // OVERRIDES
-            // =================================================
-
-            overrides: {
-
-                // =============================================
-                // BACKGROUND
-                // =============================================
-
-                "paneProperties.background": "#ffffff",
-
-                "paneProperties.vertGridProperties.color": "#f0f3fa",
-
-                "paneProperties.horzGridProperties.color": "#f0f3fa",
-
-                // =============================================
-                // TEXT
-                // =============================================
-
-                "scalesProperties.textColor": "#000000",
-
-                // =============================================
-                // CROSSHAIR
-                // =============================================
-
-                "paneProperties.crossHairProperties.color": "#758696",
-
-                // =============================================
-                // WATERMARK
-                // =============================================
-
-                "symbolWatermarkProperties.transparency": 90,
-
-                // =============================================
-                // CANDLE COLORS
-                // =============================================
-
-                "mainSeriesProperties.candleStyle.upColor": "#26a69a",
-
-                "mainSeriesProperties.candleStyle.downColor": "#ef5350",
-
-                "mainSeriesProperties.candleStyle.borderUpColor": "#26a69a",
-
-                "mainSeriesProperties.candleStyle.borderDownColor": "#ef5350",
-
-                "mainSeriesProperties.candleStyle.wickUpColor": "#26a69a",
-
-                "mainSeriesProperties.candleStyle.wickDownColor": "#ef5350",
-
-                // =============================================
-                // PRICE LINE
-                // =============================================
-
-                "mainSeriesProperties.priceLineColor": "#2962ff",
-
-                "mainSeriesProperties.showPriceLine": true,
-
-                // =============================================
-                // LAST VALUE
-                // =============================================
-
-                "mainSeriesProperties.showSeriesLastValue": true
+                return;
             }
-        });
 
-        // =====================================================
-        // CHART READY
-        // =====================================================
-
-        widget.onChartReady(() => {
-
-            console.log("✅ TradingView Ready");
-
-            const chart = widget.chart();
-
-            // =================================================
-            // LIVE EMA UPDATE
-            // =================================================
-
-            window.updateEMAValues = (ema20, ema50) => {
-
-                if (ema20 !== undefined) {
-
-                    document.getElementById(
-                        "ema20"
-                    ).innerHTML =
-                        `EMA20: ${ema20}`;
-                }
-
-                if (ema50 !== undefined) {
-
-                    document.getElementById(
-                        "ema50"
-                    ).innerHTML =
-                        `EMA50: ${ema50}`;
-                }
-            };
-
-            // =================================================
-            // SYMBOL CHANGE
-            // =================================================
-
-            chart.onSymbolChanged().subscribe(
-
-                null,
-
-                (symbolInfo) => {
-
-                    console.log(
-                        "📈 Symbol Changed:",
-                        symbolInfo
-                    );
-
-                    document.getElementById(
-                        "ema20"
-                    ).innerHTML = "EMA20: --";
-
-                    document.getElementById(
-                        "ema50"
-                    ).innerHTML = "EMA50: --";
-                }
+            console.log(
+                "✅ TradingView Loaded"
             );
 
-            // =================================================
-            // INTERVAL CHANGE
-            // =================================================
+            // =============================================
+            // CREATE WIDGET
+            // =============================================
 
-            chart.onIntervalChanged().subscribe(
+            const widget = new TradingView.widget({
 
-                null,
+                // =========================================
+                // CONTAINER
+                // =========================================
 
-                (interval) => {
+                container: "tvchart",
+
+                // =========================================
+                // LIBRARY PATH
+                // =========================================
+
+                library_path:
+                "./charting_library/",
+
+                // =========================================
+                // DATAFEED
+                // =========================================
+
+                datafeed:
+                Datafeed,
+
+                // =========================================
+                // BASIC
+                // =========================================
+
+                locale:
+                "en",
+
+                timezone:
+                "Asia/Kolkata",
+
+                autosize:
+                true,
+
+                fullscreen:
+                false,
+
+                debug:
+                true,
+
+                theme:
+                "light",
+
+                // =========================================
+                // DEFAULT SYMBOL
+                // =========================================
+
+                symbol:
+                "NSE:NIFTY 50",
+
+                interval:
+                "1",
+
+                // =========================================
+                // ENABLE FEATURES
+                // =========================================
+
+                enabled_features: [
+
+                    "study_templates"
+                ],
+
+                // =========================================
+                // DISABLE FEATURES
+                // =========================================
+
+                disabled_features: [
+
+                    "use_localstorage_for_settings",
+
+                    "header_compare",
+
+                    "header_symbol_search_hot_key",
+
+                    "timeframes_toolbar"
+                ],
+
+                // =========================================
+                // LOADING SCREEN
+                // =========================================
+
+                loading_screen: {
+
+                    backgroundColor:
+                    "#ffffff",
+
+                    foregroundColor:
+                    "#2962ff"
+                },
+
+                // =========================================
+                // OVERRIDES
+                // =========================================
+
+                overrides: {
+
+                    // =====================================
+                    // BACKGROUND
+                    // =====================================
+
+                    "paneProperties.background":
+                    "#ffffff",
+
+                    "paneProperties.vertGridProperties.color":
+                    "#f0f3fa",
+
+                    "paneProperties.horzGridProperties.color":
+                    "#f0f3fa",
+
+                    // =====================================
+                    // TEXT
+                    // =====================================
+
+                    "scalesProperties.textColor":
+                    "#000000",
+
+                    // =====================================
+                    // CROSSHAIR
+                    // =====================================
+
+                    "paneProperties.crossHairProperties.color":
+                    "#758696",
+
+                    // =====================================
+                    // WATERMARK
+                    // =====================================
+
+                    "symbolWatermarkProperties.transparency":
+                    90,
+
+                    // =====================================
+                    // CANDLES
+                    // =====================================
+
+                    "mainSeriesProperties.candleStyle.upColor":
+                    "#26a69a",
+
+                    "mainSeriesProperties.candleStyle.downColor":
+                    "#ef5350",
+
+                    "mainSeriesProperties.candleStyle.borderUpColor":
+                    "#26a69a",
+
+                    "mainSeriesProperties.candleStyle.borderDownColor":
+                    "#ef5350",
+
+                    "mainSeriesProperties.candleStyle.wickUpColor":
+                    "#26a69a",
+
+                    "mainSeriesProperties.candleStyle.wickDownColor":
+                    "#ef5350",
+
+                    // =====================================
+                    // PRICE LINE
+                    // =====================================
+
+                    "mainSeriesProperties.priceLineColor":
+                    "#2962ff"
+                }
+            });
+
+            // =============================================
+            // CHART READY
+            // =============================================
+
+            widget.onChartReady(() => {
+
+                console.log(
+                    "✅ CHART READY"
+                );
+
+                const chart =
+                    widget.activeChart();
+
+                // =========================================
+                // DATA READY
+                // =========================================
+
+                chart.dataReady(() => {
 
                     console.log(
-                        "⏱ Interval Changed:",
-                        interval
+                        "✅ DATA LOADED"
                     );
+                });
+
+                // =========================================
+                // SYMBOL CHANGE
+                // =========================================
+
+                chart.onSymbolChanged().subscribe(
+
+                    null,
+
+                    (symbolInfo) => {
+
+                        console.log(
+                            "📈 SYMBOL CHANGED:",
+                            symbolInfo
+                        );
+                    }
+                );
+
+                // =========================================
+                // INTERVAL CHANGE
+                // =========================================
+
+                chart.onIntervalChanged().subscribe(
+
+                    null,
+
+                    (interval) => {
+
+                        console.log(
+                            "⏱ INTERVAL:",
+                            interval
+                        );
+                    }
+                );
+
+                // =========================================
+                // FORCE REFRESH
+                // =========================================
+
+                setTimeout(() => {
 
                     try {
 
                         chart.resetData();
 
-                    } catch (e) {
+                        console.log(
+                            "🔄 DATA REFRESHED"
+                        );
+
+                    } catch (err) {
 
                         console.log(
-                            "Reset Error:",
-                            e
+                            "❌ REFRESH ERROR:",
+                            err
                         );
                     }
-                }
-            );
 
-            // =================================================
-            // AUTO REFRESH
-            // =================================================
+                }, 3000);
+            });
+        }
 
-            setTimeout(() => {
+        // =================================================
+        // START
+        // =================================================
 
-                try {
-
-                    chart.resetData();
-
-                } catch (e) {
-
-                    console.log(e);
-                }
-
-            }, 1000);
-        });
+        startChart();
 
     </script>
 
