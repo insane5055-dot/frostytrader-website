@@ -47,9 +47,17 @@
 
 <body>
 
+    <!-- ================================================= -->
+    <!-- CHART CONTAINER -->
+    <!-- ================================================= -->
+
     <div id="tvchart"></div>
 
     <script type="module">
+
+        // =====================================================
+        // IMPORT DATAFEED
+        // =====================================================
 
         import Datafeed from "./src/datafeed.js";
 
@@ -60,7 +68,7 @@
         const widget = new TradingView.widget({
 
             // =================================================
-            // CONTAINER
+            // BASIC
             // =================================================
 
             container: "tvchart",
@@ -79,15 +87,15 @@
 
             theme: "light",
 
+            debug: true,
+
             // =================================================
             // DEFAULT SYMBOL
             // =================================================
 
-            symbol: "IDX_I:Nifty 50",
+            symbol: "NSE:NIFTY 50",
 
             interval: "1",
-
-            debug: true,
 
             // =================================================
             // FEATURES
@@ -199,7 +207,16 @@
 
             console.log("✅ TradingView Ready");
 
-            const chart = widget.chart();
+            const chart = widget.activeChart();
+
+            // =================================================
+            // DATA READY
+            // =================================================
+
+            chart.dataReady(() => {
+
+                console.log("✅ Chart Data Loaded");
+            });
 
             // =================================================
             // SYMBOL CHANGED
@@ -236,15 +253,6 @@
             );
 
             // =================================================
-            // DATA LOADED
-            // =================================================
-
-            chart.dataReady(() => {
-
-                console.log("✅ Chart Data Loaded");
-            });
-
-            // =================================================
             // FORCE REFRESH
             // =================================================
 
@@ -252,16 +260,16 @@
 
                 try {
 
-                    widget.activeChart().resetData();
+                    chart.resetData();
 
                     console.log("🔄 Chart Refreshed");
 
                 } catch (e) {
 
-                    console.log(e);
+                    console.log("❌ Refresh Error:", e);
                 }
 
-            }, 2000);
+            }, 3000);
         });
 
     </script>
