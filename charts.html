@@ -1,210 +1,236 @@
-<meta charset="UTF-8" />
+<!DOCTYPE html>
+<html lang="en">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
 
-<title>Frosty Trader Chart</title>
+    <meta charset="UTF-8" />
 
-<!-- ================================================= -->
-<!-- TRADINGVIEW LIBRARY -->
-<!-- ================================================= -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<script src="charting_library/charting_library.js"></script>
+    <title>Frosty Trader Chart</title>
 
-<!-- ================================================= -->
-<!-- SOCKET.IO -->
-<!-- ================================================= -->
+    <!-- ================================================= -->
+    <!-- TRADINGVIEW LIBRARY -->
+    <!-- ================================================= -->
 
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="charting_library/charting_library.js"></script>
 
-<style>
+    <!-- ================================================= -->
+    <!-- SOCKET.IO -->
+    <!-- ================================================= -->
 
-    html,
-    body,
-    #tvchart {
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
-        margin: 0;
-        padding: 0;
+    <style>
 
-        width: 100%;
-        height: 100%;
+        html,
+        body,
+        #tvchart {
 
-        overflow: hidden;
+            margin: 0;
+            padding: 0;
 
-        background: #ffffff;
-    }
+            width: 100%;
+            height: 100%;
 
-</style>
+            overflow: hidden;
 
-<div id="tvchart"></div>
-
-<script type="module">
-
-    import Datafeed from "./src/datafeed.js";
-
-    // =====================================================
-    // CREATE WIDGET
-    // =====================================================
-
-    const widget = new TradingView.widget({
-
-        // =================================================
-        // BASIC
-        // =================================================
-
-        container: "tvchart",
-
-        library_path: "./charting_library/",
-
-        datafeed: Datafeed,
-
-        locale: "en",
-
-        timezone: "Asia/Kolkata",
-
-        autosize: true,
-
-        fullscreen: false,
-
-        theme: "light",
-
-        symbol: "NSE:NIFTY 50",
-
-        interval: "1",
-
-        debug: false,
-
-        // =================================================
-        // FEATURES
-        // =================================================
-
-        enabled_features: [
-
-            "study_templates"
-        ],
-
-        disabled_features: [
-
-            "use_localstorage_for_settings",
-
-            "volume_force_overlay",
-
-            "header_compare",
-
-            "header_symbol_search_hot_key"
-        ],
-
-        // =================================================
-        // LOADING SCREEN
-        // =================================================
-
-        loading_screen: {
-
-            backgroundColor: "#ffffff",
-
-            foregroundColor: "#2962ff"
-        },
-
-        // =================================================
-        // OVERRIDES
-        // =================================================
-
-        overrides: {
-
-            // =============================================
-            // BACKGROUND
-            // =============================================
-
-            "paneProperties.background": "#ffffff",
-
-            "paneProperties.vertGridProperties.color": "#f0f3fa",
-
-            "paneProperties.horzGridProperties.color": "#f0f3fa",
-
-            // =============================================
-            // TEXT
-            // =============================================
-
-            "scalesProperties.textColor": "#000000",
-
-            // =============================================
-            // CROSSHAIR
-            // =============================================
-
-            "paneProperties.crossHairProperties.color": "#758696",
-
-            // =============================================
-            // WATERMARK
-            // =============================================
-
-            "symbolWatermarkProperties.transparency": 90,
-
-            // =============================================
-            // CANDLE COLORS
-            // =============================================
-
-            "mainSeriesProperties.candleStyle.upColor": "#26a69a",
-
-            "mainSeriesProperties.candleStyle.downColor": "#ef5350",
-
-            "mainSeriesProperties.candleStyle.borderUpColor": "#26a69a",
-
-            "mainSeriesProperties.candleStyle.borderDownColor": "#ef5350",
-
-            "mainSeriesProperties.candleStyle.wickUpColor": "#26a69a",
-
-            "mainSeriesProperties.candleStyle.wickDownColor": "#ef5350",
-
-            // =============================================
-            // PRICE LINE
-            // =============================================
-
-            "mainSeriesProperties.priceLineColor": "#2962ff",
-
-            "mainSeriesProperties.showPriceLine": true,
-
-            // =============================================
-            // LAST VALUE
-            // =============================================
-
-            "mainSeriesProperties.showSeriesLastValue": true
+            background: #ffffff;
         }
-    });
 
-    // =====================================================
-    // CHART READY
-    // =====================================================
+    </style>
 
-    widget.onChartReady(() => {
+</head>
 
-        console.log("✅ TradingView Ready");
+<body>
 
-        const chart = widget.chart();
+    <div id="tvchart"></div>
 
-        // =================================================
-        // SYMBOL CHANGE
-        // =================================================
+    <script type="module">
 
-        chart.onSymbolChanged().subscribe(
+        import Datafeed from "./src/datafeed.js";
 
-            null,
+        // =====================================================
+        // CREATE WIDGET
+        // =====================================================
 
-            (symbolInfo) => {
+        const widget = new TradingView.widget({
 
-                console.log("📈 Symbol Changed:", symbolInfo);
+            // =================================================
+            // BASIC
+            // =================================================
+
+            container: "tvchart",
+
+            library_path: "./charting_library/",
+
+            datafeed: Datafeed,
+
+            locale: "en",
+
+            timezone: "Asia/Kolkata",
+
+            autosize: true,
+
+            fullscreen: false,
+
+            theme: "light",
+
+            symbol: "NSE:NIFTY 50",
+
+            interval: "1",
+
+            debug: false,
+
+            // =================================================
+            // FEATURES
+            // =================================================
+
+            enabled_features: [
+
+                "study_templates"
+            ],
+
+            disabled_features: [
+
+                "use_localstorage_for_settings",
+
+                "volume_force_overlay",
+
+                "header_compare",
+
+                "header_symbol_search_hot_key"
+            ],
+
+            // =================================================
+            // LOADING SCREEN
+            // =================================================
+
+            loading_screen: {
+
+                backgroundColor: "#ffffff",
+
+                foregroundColor: "#2962ff"
+            },
+
+            // =================================================
+            // OVERRIDES
+            // =================================================
+
+            overrides: {
+
+                // =============================================
+                // BACKGROUND
+                // =============================================
+
+                "paneProperties.background": "#ffffff",
+
+                "paneProperties.vertGridProperties.color": "#f0f3fa",
+
+                "paneProperties.horzGridProperties.color": "#f0f3fa",
+
+                // =============================================
+                // TEXT
+                // =============================================
+
+                "scalesProperties.textColor": "#000000",
+
+                // =============================================
+                // CROSSHAIR
+                // =============================================
+
+                "paneProperties.crossHairProperties.color": "#758696",
+
+                // =============================================
+                // WATERMARK
+                // =============================================
+
+                "symbolWatermarkProperties.transparency": 90,
+
+                // =============================================
+                // CANDLE COLORS
+                // =============================================
+
+                "mainSeriesProperties.candleStyle.upColor": "#26a69a",
+
+                "mainSeriesProperties.candleStyle.downColor": "#ef5350",
+
+                "mainSeriesProperties.candleStyle.borderUpColor": "#26a69a",
+
+                "mainSeriesProperties.candleStyle.borderDownColor": "#ef5350",
+
+                "mainSeriesProperties.candleStyle.wickUpColor": "#26a69a",
+
+                "mainSeriesProperties.candleStyle.wickDownColor": "#ef5350",
+
+                // =============================================
+                // PRICE LINE
+                // =============================================
+
+                "mainSeriesProperties.priceLineColor": "#2962ff",
+
+                "mainSeriesProperties.showPriceLine": true,
+
+                // =============================================
+                // LAST VALUE
+                // =============================================
+
+                "mainSeriesProperties.showSeriesLastValue": true
             }
-        );
+        });
 
-        // =================================================
-        // INTERVAL CHANGE
-        // =================================================
+        // =====================================================
+        // CHART READY
+        // =====================================================
 
-        chart.onIntervalChanged().subscribe(
+        widget.onChartReady(() => {
 
-            null,
+            console.log("✅ TradingView Ready");
 
-            (interval) => {
+            const chart = widget.chart();
 
-                console.log("⏱ Interval Changed:", interval);
+            // =================================================
+            // SYMBOL CHANGE
+            // =================================================
+
+            chart.onSymbolChanged().subscribe(
+
+                null,
+
+                (symbolInfo) => {
+
+                    console.log("📈 Symbol Changed:", symbolInfo);
+                }
+            );
+
+            // =================================================
+            // INTERVAL CHANGE
+            // =================================================
+
+            chart.onIntervalChanged().subscribe(
+
+                null,
+
+                (interval) => {
+
+                    console.log("⏱ Interval Changed:", interval);
+
+                    try {
+
+                        chart.resetData();
+
+                    } catch (e) {
+
+                        console.log("Reset Error:", e);
+                    }
+                }
+            );
+
+            // =================================================
+            // AUTO REFRESH
+            // =================================================
+
+            setTimeout(() => {
 
                 try {
 
@@ -212,27 +238,14 @@
 
                 } catch (e) {
 
-                    console.log("Reset Error:", e);
+                    console.log(e);
                 }
-            }
-        );
 
-        // =================================================
-        // AUTO REFRESH
-        // =================================================
+            }, 1000);
+        });
 
-        setTimeout(() => {
+    </script>
 
-            try {
+</body>
 
-                chart.resetData();
-
-            } catch (e) {
-
-                console.log(e);
-            }
-
-        }, 1000);
-    });
-
-</script>
+</html>
