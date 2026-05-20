@@ -44,6 +44,10 @@
 
 <body>
 
+    <!-- ================================================= -->
+    <!-- CHART -->
+    <!-- ================================================= -->
+
     <div id="tvchart"></div>
 
     <script type="module">
@@ -99,7 +103,9 @@
 
                 "header_compare",
 
-                "header_symbol_search_hot_key"
+                "header_symbol_search_hot_key",
+
+                "header_screenshot"
             ],
 
             // =================================================
@@ -199,7 +205,22 @@
 
                 (symbolInfo) => {
 
-                    console.log("📈 Symbol Changed:", symbolInfo);
+                    console.log(
+                        "📈 Symbol Changed:",
+                        symbolInfo
+                    );
+
+                    try {
+
+                        chart.resetData();
+
+                    } catch (e) {
+
+                        console.log(
+                            "Reset Error:",
+                            e
+                        );
+                    }
                 }
             );
 
@@ -213,7 +234,10 @@
 
                 (interval) => {
 
-                    console.log("⏱ Interval Changed:", interval);
+                    console.log(
+                        "⏱ Interval Changed:",
+                        interval
+                    );
 
                     try {
 
@@ -221,7 +245,10 @@
 
                     } catch (e) {
 
-                        console.log("Reset Error:", e);
+                        console.log(
+                            "Reset Error:",
+                            e
+                        );
                     }
                 }
             );
@@ -242,6 +269,28 @@
                 }
 
             }, 1000);
+
+            // =================================================
+            // SOCKET CONNECTION TEST
+            // =================================================
+
+            const socket =
+                io("https://frosty-backend-4mox.onrender.com");
+
+            socket.on("connect", () => {
+
+                console.log(
+                    "✅ Socket Connected"
+                );
+            });
+
+            socket.on("disconnect", () => {
+
+                console.log(
+                    "❌ Socket Disconnected"
+                );
+            });
+
         });
 
     </script>
