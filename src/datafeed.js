@@ -28,13 +28,63 @@ const Datafeed = {
     // ON READY
     // =====================================================
 
-    onReady: (cb) => {
+    onReady: (callback) => {
 
         console.log("✅ Datafeed Ready");
 
-        cb({
-            supported_resolutions: ["1", "5", "15"]
-        });
+        setTimeout(() => {
+
+            callback({
+
+                supported_resolutions: [
+
+                    "1",
+                    "5",
+                    "15",
+                    "30",
+                    "60"
+                ],
+
+                exchanges: [
+
+                    {
+                        value: "NSE",
+                        name: "NSE",
+                        desc: "National Stock Exchange"
+                    },
+
+                    {
+                        value: "BSE",
+                        name: "BSE",
+                        desc: "Bombay Stock Exchange"
+                    }
+                ],
+
+                symbols_types: [
+
+                    {
+                        name: "stock",
+                        value: "stock"
+                    },
+
+                    {
+                        name: "index",
+                        value: "index"
+                    },
+
+                    {
+                        name: "futures",
+                        value: "futures"
+                    },
+
+                    {
+                        name: "option",
+                        value: "option"
+                    }
+                ]
+            });
+
+        }, 0);
     },
 
     // =====================================================
@@ -58,11 +108,12 @@ const Datafeed = {
 
                 console.log("🔍 Searching:", userInput);
 
-                const res = await fetch(
+                const response = await fetch(
+
                     `${BASE_URL}/search?q=${encodeURIComponent(userInput)}`
                 );
 
-                const data = await res.json();
+                const data = await response.json();
 
                 if (searchId !== lastSearchId) {
                     return;
@@ -74,7 +125,7 @@ const Datafeed = {
 
             } catch (err) {
 
-                console.error("❌ Search error:", err);
+                console.error("❌ Search Error:", err);
 
                 onResultReadyCallback([]);
             }
@@ -87,39 +138,42 @@ const Datafeed = {
     // =====================================================
 
     resolveSymbol: async (
+
         symbolName,
-        onResolve,
-        onError
+        onSymbolResolvedCallback,
+        onResolveErrorCallback
+
     ) => {
 
         try {
 
-            console.log("📌 Resolving:", symbolName);
+            console.log("📌 Resolving Symbol:", symbolName);
 
-            const res = await fetch(
+            const response = await fetch(
+
                 `${BASE_URL}/resolve?symbol=${encodeURIComponent(symbolName)}`
             );
 
-            const data = await res.json();
+            const data = await response.json();
 
-            console.log("✅ Resolve Data:", data);
+            console.log("✅ Resolve Response:", data);
 
             if (data.error) {
 
-                onError(data.error);
+                onResolveErrorCallback(data.error);
 
                 return;
             }
 
-            onResolve({
-
-                name: data.name,
+            const symbolInfo = {
 
                 ticker: data.ticker,
 
+                name: data.name,
+
                 description: data.description,
 
-                type: data.type.toLowerCase(),
+                type: data.type,
 
                 session: data.session,
 
@@ -137,61 +191,98 @@ const Datafeed = {
 
                 has_weekly_and_monthly: true,
 
-                supported_resolutions: data.supported_resolutions,
+                supported_resolutions:
+                data.supported_resolutions,
 
-                volume_precision: 2,
+                volume_precision:
+                data.volume_precision,
 
-                data_status: "streaming",
+                data_status:
+                "streaming",
 
-                security_id: data.security_id,
+                // =============================================
+                // CUSTOM
+                // =============================================
 
-                instrument: data.instrument,
+                security_id:
+                data.security_id,
 
-                exchange_segment: data.exchange_segment
-            });
+                instrument:
+                data.instrument,
+
+                exchange_segment:
+                data.exchange_segment
+            };
+
+            onSymbolResolvedCallback(symbolInfo);
 
         } catch (err) {
 
-            console.error("❌ Resolve error:", err);
+            console.error("❌ Resolve Error:", err);
 
-            onError("Resolve error");
+            onResolveErrorCallback("Cannot resolve symbol");
         }
     },
 
     // =====================================================
-    // HISTORY
+    // GET BARS
     // =====================================================
 
     getBars: async (
+
         symbolInfo,
         resolution,
         periodParams,
         onHistoryCallback,
         onErrorCallback
+
     ) => {
 
         try {
 
-            console.log("📚 Loading history...");
+            console.log("📚 Loading History...");
 
-            const { from, to } = periodParams;
+            const from = periodParams.from;
+            const to = periodParams.to;
 
             const url =
+
                 `${BASE_URL}/history` +
+
                 `?security_id=${symbolInfo.security_id}` +
+
                 `&exchange=${symbolInfo.exchange_segment}` +
+
                 `&instrument=${symbolInfo.instrument}` +
+
                 `&resolution=${resolution}` +
+
                 `&from=${from}` +
+
                 `&to=${to}`;
 
-            const res = await fetch(url);
+            console.log("🌐 HISTORY URL:", url);
 
-            const data = await res.json();
+            const response = await fetch(url);
+
+            const data = await response.json();
 
             console.log("📦 History Response:", data);
 
-            if (data.s !== "ok") {
+            // =================================================
+            // NO DATA
+            // =================================================
+
+            if (
+
+                !data ||
+                data.s !== "ok" ||
+                !data.t ||
+                data.t.length === 0
+
+            ) {
+
+                console.log("⚠️ NO DATA FOUND");
 
                 onHistoryCallback([], {
                     noData: true
@@ -200,30 +291,50 @@ const Datafeed = {
                 return;
             }
 
-            const bars = data.t.map((t, i) => ({
+            // =================================================
+            // FORMAT BARS
+            // =================================================
 
-                time: t * 1000,
+            const bars = [];
 
-                open: data.o[i],
+            for (let i = 0; i < data.t.length; i++) {
 
-                high: data.h[i],
+                bars.push({
 
-                low: data.l[i],
+                    time:
+                    data.t[i] * 1000,
 
-                close: data.c[i],
+                    open:
+                    Number(data.o[i]),
 
-                volume: data.v[i]
-            }));
+                    high:
+                    Number(data.h[i]),
+
+                    low:
+                    Number(data.l[i]),
+
+                    close:
+                    Number(data.c[i]),
+
+                    volume:
+                    Number(data.v[i] || 0)
+                });
+            }
 
             console.log("✅ Bars Loaded:", bars.length);
 
-            onHistoryCallback(bars, {
-                noData: false
-            });
+            onHistoryCallback(
+
+                bars,
+
+                {
+                    noData: false
+                }
+            );
 
         } catch (err) {
 
-            console.error("❌ History error:", err);
+            console.error("❌ getBars Error:", err);
 
             onErrorCallback(err);
         }
@@ -234,26 +345,34 @@ const Datafeed = {
     // =====================================================
 
     subscribeBars: (
+
         symbolInfo,
         resolution,
         onRealtimeCallback,
-        subscriberUID
+        subscriberUID,
+        onResetCacheNeededCallback
+
     ) => {
 
         console.log("📡 subscribeBars:", symbolInfo.name);
 
-        // update callback
         currentCallback = onRealtimeCallback;
 
-        // reuse existing socket
+        // =================================================
+        // REUSE SOCKET
+        // =================================================
+
         if (socket && socket.connected) {
 
-            console.log("♻️ Reusing existing socket");
+            console.log("♻️ Reusing Existing Socket");
 
             return;
         }
 
-        // cleanup old socket
+        // =================================================
+        // CLEANUP OLD SOCKET
+        // =================================================
+
         if (socket) {
 
             socket.disconnect();
@@ -271,13 +390,13 @@ const Datafeed = {
 
             reconnection: true,
 
-            reconnectionAttempts: 5,
+            reconnectionAttempts: 10,
 
-            reconnectionDelay: 3000,
+            reconnectionDelay: 2000,
 
             timeout: 20000,
 
-            forceNew: false
+            forceNew: true
         });
 
         // =================================================
@@ -304,7 +423,7 @@ const Datafeed = {
 
         socket.on("connect_error", (err) => {
 
-            console.log("⚠️ WS Error:", err.message);
+            console.log("⚠️ Socket Error:", err.message);
         });
 
         // =================================================
@@ -313,25 +432,31 @@ const Datafeed = {
 
         socket.on("candle", (candle) => {
 
-            // console.log("📊 Live Candle:", candle);
-
             if (!currentCallback) {
                 return;
             }
 
+            // console.log("📊 LIVE:", candle);
+
             currentCallback({
 
-                time: candle.minute * 60 * 1000,
+                time:
+                candle.minute * 60 * 1000,
 
-                open: candle.open,
+                open:
+                candle.open,
 
-                high: candle.high,
+                high:
+                candle.high,
 
-                low: candle.low,
+                low:
+                candle.low,
 
-                close: candle.close,
+                close:
+                candle.close,
 
-                volume: candle.volume
+                volume:
+                candle.volume || 0
             });
         });
     },
@@ -340,9 +465,9 @@ const Datafeed = {
     // UNSUBSCRIBE
     // =====================================================
 
-    unsubscribeBars: () => {
+    unsubscribeBars: (subscriberUID) => {
 
-        console.log("🛑 unsubscribeBars");
+        console.log("🛑 unsubscribeBars:", subscriberUID);
 
         currentCallback = null;
     }
