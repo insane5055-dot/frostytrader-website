@@ -10,10 +10,10 @@
         content="width=device-width, initial-scale=1.0"
     />
 
-    <title>Frosty Trader</title>
+    <title>Frosty Trader Pro</title>
 
     <!-- ================================================= -->
-    <!-- TRADINGVIEW -->
+    <!-- TRADINGVIEW LIBRARY -->
     <!-- ================================================= -->
 
     <script src="./charting_library/charting_library.js"></script>
@@ -39,6 +39,49 @@
             overflow: hidden;
 
             background: #ffffff;
+
+            font-family: Arial, sans-serif;
+        }
+
+        .topbar {
+
+            position: absolute;
+
+            top: 10px;
+            left: 10px;
+
+            z-index: 9999;
+
+            display: flex;
+
+            gap: 10px;
+
+            background: rgba(255,255,255,0.95);
+
+            padding: 8px 12px;
+
+            border-radius: 10px;
+
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .indicator-box {
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            color: #000;
+        }
+
+        .ema20 {
+
+            color: #2962ff;
+        }
+
+        .ema50 {
+
+            color: #ff6d00;
         }
 
     </style>
@@ -48,16 +91,34 @@
 <body>
 
     <!-- ================================================= -->
-    <!-- CHART CONTAINER -->
+    <!-- EMA DISPLAY -->
+    <!-- ================================================= -->
+
+    <div class="topbar">
+
+        <div
+            class="indicator-box ema20"
+            id="ema20"
+        >
+            EMA20: --
+        </div>
+
+        <div
+            class="indicator-box ema50"
+            id="ema50"
+        >
+            EMA50: --
+        </div>
+
+    </div>
+
+    <!-- ================================================= -->
+    <!-- CHART -->
     <!-- ================================================= -->
 
     <div id="tvchart"></div>
 
     <script type="module">
-
-        // =====================================================
-        // IMPORT DATAFEED
-        // =====================================================
 
         import Datafeed from "./src/datafeed.js";
 
@@ -87,15 +148,11 @@
 
             theme: "light",
 
-            debug: true,
-
-            // =================================================
-            // DEFAULT SYMBOL
-            // =================================================
-
             symbol: "NSE:NIFTY 50",
 
             interval: "1",
+
+            debug: false,
 
             // =================================================
             // FEATURES
@@ -110,11 +167,11 @@
 
                 "use_localstorage_for_settings",
 
+                "volume_force_overlay",
+
                 "header_compare",
 
-                "header_symbol_search_hot_key",
-
-                "timeframes_toolbar"
+                "header_symbol_search_hot_key"
             ],
 
             // =================================================
@@ -138,88 +195,97 @@
                 // BACKGROUND
                 // =============================================
 
-                "paneProperties.background":
-                "#ffffff",
+                "paneProperties.background": "#ffffff",
 
-                "paneProperties.vertGridProperties.color":
-                "#f0f3fa",
+                "paneProperties.vertGridProperties.color": "#f0f3fa",
 
-                "paneProperties.horzGridProperties.color":
-                "#f0f3fa",
+                "paneProperties.horzGridProperties.color": "#f0f3fa",
 
                 // =============================================
                 // TEXT
                 // =============================================
 
-                "scalesProperties.textColor":
-                "#000000",
+                "scalesProperties.textColor": "#000000",
 
                 // =============================================
                 // CROSSHAIR
                 // =============================================
 
-                "paneProperties.crossHairProperties.color":
-                "#758696",
+                "paneProperties.crossHairProperties.color": "#758696",
 
                 // =============================================
                 // WATERMARK
                 // =============================================
 
-                "symbolWatermarkProperties.transparency":
-                90,
+                "symbolWatermarkProperties.transparency": 90,
 
                 // =============================================
                 // CANDLE COLORS
                 // =============================================
 
-                "mainSeriesProperties.candleStyle.upColor":
-                "#26a69a",
+                "mainSeriesProperties.candleStyle.upColor": "#26a69a",
 
-                "mainSeriesProperties.candleStyle.downColor":
-                "#ef5350",
+                "mainSeriesProperties.candleStyle.downColor": "#ef5350",
 
-                "mainSeriesProperties.candleStyle.borderUpColor":
-                "#26a69a",
+                "mainSeriesProperties.candleStyle.borderUpColor": "#26a69a",
 
-                "mainSeriesProperties.candleStyle.borderDownColor":
-                "#ef5350",
+                "mainSeriesProperties.candleStyle.borderDownColor": "#ef5350",
 
-                "mainSeriesProperties.candleStyle.wickUpColor":
-                "#26a69a",
+                "mainSeriesProperties.candleStyle.wickUpColor": "#26a69a",
 
-                "mainSeriesProperties.candleStyle.wickDownColor":
-                "#ef5350",
+                "mainSeriesProperties.candleStyle.wickDownColor": "#ef5350",
 
                 // =============================================
                 // PRICE LINE
                 // =============================================
 
-                "mainSeriesProperties.priceLineColor":
-                "#2962ff"
+                "mainSeriesProperties.priceLineColor": "#2962ff",
+
+                "mainSeriesProperties.showPriceLine": true,
+
+                // =============================================
+                // LAST VALUE
+                // =============================================
+
+                "mainSeriesProperties.showSeriesLastValue": true
             }
         });
 
         // =====================================================
-        // READY
+        // CHART READY
         // =====================================================
 
         widget.onChartReady(() => {
 
             console.log("✅ TradingView Ready");
 
-            const chart = widget.activeChart();
+            const chart = widget.chart();
 
             // =================================================
-            // DATA READY
+            // LIVE EMA UPDATE
             // =================================================
 
-            chart.dataReady(() => {
+            window.updateEMAValues = (ema20, ema50) => {
 
-                console.log("✅ Chart Data Loaded");
-            });
+                if (ema20 !== undefined) {
+
+                    document.getElementById(
+                        "ema20"
+                    ).innerHTML =
+                        `EMA20: ${ema20}`;
+                }
+
+                if (ema50 !== undefined) {
+
+                    document.getElementById(
+                        "ema50"
+                    ).innerHTML =
+                        `EMA50: ${ema50}`;
+                }
+            };
 
             // =================================================
-            // SYMBOL CHANGED
+            // SYMBOL CHANGE
             // =================================================
 
             chart.onSymbolChanged().subscribe(
@@ -232,11 +298,19 @@
                         "📈 Symbol Changed:",
                         symbolInfo
                     );
+
+                    document.getElementById(
+                        "ema20"
+                    ).innerHTML = "EMA20: --";
+
+                    document.getElementById(
+                        "ema50"
+                    ).innerHTML = "EMA50: --";
                 }
             );
 
             // =================================================
-            // INTERVAL CHANGED
+            // INTERVAL CHANGE
             // =================================================
 
             chart.onIntervalChanged().subscribe(
@@ -249,11 +323,23 @@
                         "⏱ Interval Changed:",
                         interval
                     );
+
+                    try {
+
+                        chart.resetData();
+
+                    } catch (e) {
+
+                        console.log(
+                            "Reset Error:",
+                            e
+                        );
+                    }
                 }
             );
 
             // =================================================
-            // FORCE REFRESH
+            // AUTO REFRESH
             // =================================================
 
             setTimeout(() => {
@@ -262,14 +348,12 @@
 
                     chart.resetData();
 
-                    console.log("🔄 Chart Refreshed");
-
                 } catch (e) {
 
-                    console.log("❌ Refresh Error:", e);
+                    console.log(e);
                 }
 
-            }, 3000);
+            }, 1000);
         });
 
     </script>
